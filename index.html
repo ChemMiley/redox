@@ -99,7 +99,7 @@
   <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl sticky top-0 z-30 border-b border-indigo-500/30">
     <div class="max-w-6xl mx-auto px-3 sm:px-5 py-3.5 sm:py-4 space-y-3">
       
-      <!-- 網站標題與大廳返回鈕 -->
+      <!-- 網站標題與首頁返回鈕 -->
       <div class="flex items-center justify-between gap-2">
         <div onclick="showWelcome()" class="flex items-center gap-3 cursor-pointer group min-w-0">
           <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-400/20 border border-amber-300/50 flex items-center justify-center text-xl sm:text-2xl shrink-0 group-hover:scale-105 transition">
@@ -119,7 +119,7 @@
           <!-- 返回歡迎頁按鈕 -->
           <button onclick="showWelcome()" id="home-btn" class="hidden px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 text-xs sm:text-sm font-bold transition flex items-center gap-1.5">
             <span>🏠</span>
-            <span class="hidden sm:inline">返回大廳</span>
+            <span class="hidden sm:inline">返回首頁</span>
           </button>
         </div>
       </div>
@@ -147,7 +147,7 @@
   <!-- 主內容區 -->
   <main class="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-5 py-6 sm:py-8">
 
-    <!-- ==================== 歡迎入口大廳 ==================== -->
+    <!-- ==================== 歡迎入口首頁 ==================== -->
     <section id="welcome-screen" class="fade-in max-w-5xl mx-auto space-y-8 py-2 sm:py-6">
       <div class="text-center space-y-3 max-w-2xl mx-auto">
         <span class="inline-block px-3.5 py-1 rounded-full text-xs font-extrabold bg-indigo-100 text-indigo-800 tracking-wide">
@@ -506,8 +506,8 @@
     <section id="stage-3" class="hidden fade-in space-y-5 sm:space-y-6">
       <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-base sm:text-lg font-bold text-slate-800">段考／分科測驗｜全反應係數平衡挑戰</h2>
-          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">每次進入隨機輪播不重複，利用「得電子總數 ＝ 失電子總數」求算最簡整數係數</p>
+          <h2 class="text-base sm:text-lg font-bold text-slate-800"> 全反應平衡法 </h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5"> 沒事多練習，多練習沒事 </p>
         </div>
         <div class="flex items-center justify-between sm:justify-end gap-2">
           <button onclick="prevFullRxn()" class="px-3.5 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-xs sm:text-sm font-bold">&larr; 上一題</button>
@@ -2078,7 +2078,7 @@
       document.getElementById(`stage-${tabNum}`).classList.remove('hidden');
     }
 
-    // 初始化（預設先進入歡迎大廳，半反應式與全反應式載入隨機首題）
+    // 初始化（預設先進入歡迎首頁，半反應式與全反應式載入隨機首題）
     setFilter('all');
     loadHalfReaction(halfOrder[0]);
     renderFullRxn();
