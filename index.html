@@ -36,97 +36,257 @@
       text-underline-offset: 4px;
     }
     .fade-in {
-      animation: fadeIn 0.3s ease-in-out;
+      animation: fadeIn 0.35s ease-out;
     }
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
+    }
+    .float-anim {
+      animation: floatY 2.6s ease-in-out infinite;
+    }
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
+    }
+
+    /* 畫面正中央閃動漸大後淡出消失特效 */
+    @keyframes popFlashFade {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.45);
+        filter: brightness(1);
+      }
+      18% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.16);
+        filter: brightness(1.22);
+      }
+      32% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.98);
+        filter: brightness(1);
+      }
+      48% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.08);
+        filter: brightness(1.15);
+      }
+      72% {
+        opacity: 1;
+        transform: translate(-50%, -54%) scale(1.05);
+        filter: brightness(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -68%) scale(1.25);
+        filter: brightness(1.1);
+      }
+    }
+    .praise-pop-effect {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      z-index: 9999;
+      pointer-events: none;
+      animation: popFlashFade 1.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
   </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
 
   <!-- 頂部導覽列 -->
-  <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-lg sticky top-0 z-30">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-xl shrink-0">
-          ⚗️
+  <header class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl sticky top-0 z-30 border-b border-indigo-500/30">
+    <div class="max-w-6xl mx-auto px-3 sm:px-5 py-3.5 sm:py-4 space-y-3">
+      
+      <!-- 網站標題與大廳返回鈕 -->
+      <div class="flex items-center justify-between gap-2">
+        <div onclick="showWelcome()" class="flex items-center gap-3 cursor-pointer group min-w-0">
+          <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-400/20 border border-amber-300/50 flex items-center justify-center text-xl sm:text-2xl shrink-0 group-hover:scale-105 transition">
+            🔬
+          </div>
+          <div class="min-w-0">
+            <h1 class="text-base sm:text-xl font-black tracking-wide text-white truncate group-hover:text-amber-200 transition">
+              高三選修化學 IV｜氧化還原互動學習
+            </h1>
+            <p class="text-[11px] sm:text-xs text-indigo-200/90 truncate">
+              常見氧化劑／還原劑對應變化・半反應式平衡法・全反應平衡法
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-lg md:text-xl font-bold tracking-wide">高三選修化學 IV｜氧化還原互動學習</h1>
-          <p class="text-xs text-indigo-200">常見氧化劑／還原劑對應變化・半反應平衡法・全反應平衡法 </p>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <!-- 返回歡迎頁按鈕 -->
+          <button onclick="showWelcome()" id="home-btn" class="hidden px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 text-xs sm:text-sm font-bold transition flex items-center gap-1.5">
+            <span>🏠</span>
+            <span class="hidden sm:inline">返回大廳</span>
+          </button>
         </div>
       </div>
 
-      <!-- 階段切換按鈕 -->
-      <nav class="flex flex-wrap bg-slate-800/80 p-1 rounded-xl border border-slate-700/80 gap-1">
-        <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all bg-indigo-600 text-white shadow">
-          ① 常見氧化劑或還原劑對應變化
+      <!-- 三種模式切換按鈕（預設全白底，選中變亮黃色） -->
+      <nav id="top-nav-tabs" aria-label="學習模式切換" class="hidden grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+        <button onclick="switchTab(1)" id="tab-btn-1" class="tab-btn flex items-center justify-center sm:justify-start gap-2.5 px-4 py-2.5 rounded-xl text-sm sm:text-base font-extrabold transition-all bg-white text-slate-800 border-2 border-white/80 hover:bg-amber-50 shadow">
+          <span class="text-xl sm:text-2xl leading-none" aria-hidden="true">🧪</span>
+          <span class="leading-snug text-left">常見氧化劑或還原劑對應變化</span>
         </button>
-        <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all text-slate-300 hover:text-white">
-          ② 半反應式平衡法
+
+        <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn flex items-center justify-center sm:justify-start gap-2.5 px-4 py-2.5 rounded-xl text-sm sm:text-base font-extrabold transition-all bg-white text-slate-800 border-2 border-white/80 hover:bg-amber-50 shadow">
+          <span class="text-xl sm:text-2xl leading-none" aria-hidden="true">⚗️</span>
+          <span class="leading-snug">半反應式平衡法</span>
         </button>
-        <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all text-slate-300 hover:text-white">
-          ③ 全反應平衡法
+
+        <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn flex items-center justify-center sm:justify-start gap-2.5 px-4 py-2.5 rounded-xl text-sm sm:text-base font-extrabold transition-all bg-white text-slate-800 border-2 border-white/80 hover:bg-amber-50 shadow">
+          <span class="text-xl sm:text-2xl leading-none" aria-hidden="true">🧫</span>
+          <span class="leading-snug">全反應平衡法</span>
         </button>
       </nav>
     </div>
   </header>
 
   <!-- 主內容區 -->
-  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6">
+  <main class="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-5 py-6 sm:py-8">
+
+    <!-- ==================== 歡迎入口大廳 ==================== -->
+    <section id="welcome-screen" class="fade-in max-w-5xl mx-auto space-y-8 py-2 sm:py-6">
+      <div class="text-center space-y-3 max-w-2xl mx-auto">
+        <span class="inline-block px-3.5 py-1 rounded-full text-xs font-extrabold bg-indigo-100 text-indigo-800 tracking-wide">
+          ✨ 高三選修化學 IV 氧化還原線上互動
+        </span>
+        <h2 class="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight leading-snug">
+          今天想挑戰哪一個關卡？
+        </h2>
+        <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+          從試劑變化記憶、半反應平衡法，到全反應平衡法，三步驟引導攻克氧化還原！
+        </p>
+      </div>
+
+      <!-- 三大練習模式選擇卡片 -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+        
+        <!-- 卡片 1 -->
+        <div onclick="switchTab(1)" class="group bg-white rounded-3xl p-6 sm:p-7 shadow-md hover:shadow-xl border-2 border-slate-200 hover:border-amber-400 cursor-pointer transition-all duration-300 flex flex-col justify-between hover:-translate-y-1">
+          <div class="space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-indigo-50 group-hover:bg-amber-100 border border-indigo-100 group-hover:border-amber-300 flex items-center justify-center text-4xl transition">
+              🧪
+            </div>
+            <div class="space-y-2">
+              <span class="text-xs font-extrabold text-indigo-600 group-hover:text-amber-700 uppercase tracking-wider">關卡 1・基礎打底</span>
+              <h3 class="text-xl font-black text-slate-900 leading-snug">
+                常見氧化劑或還原劑對應變化
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                23 組必考反應情境、顏色與氧化數變化，附翻卡記憶、不重複測驗與錯題練習區。
+              </p>
+            </div>
+          </div>
+          <div class="pt-6 mt-4 border-t border-slate-100 flex items-center justify-between text-sm font-extrabold text-indigo-700 group-hover:text-amber-700">
+            <span>進入記憶與測驗</span>
+            <span class="text-lg group-hover:translate-x-1 transition-transform">&rarr;</span>
+          </div>
+        </div>
+
+        <!-- 卡片 2 -->
+        <div onclick="switchTab(2)" class="group bg-white rounded-3xl p-6 sm:p-7 shadow-md hover:shadow-xl border-2 border-slate-200 hover:border-amber-400 cursor-pointer transition-all duration-300 flex flex-col justify-between hover:-translate-y-1">
+          <div class="space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-emerald-50 group-hover:bg-amber-100 border border-emerald-100 group-hover:border-amber-300 flex items-center justify-center text-4xl transition">
+              ⚗️
+            </div>
+            <div class="space-y-2">
+              <span class="text-xs font-extrabold text-emerald-600 group-hover:text-amber-700 uppercase tracking-wider">關卡 2・觀念拆解</span>
+              <h3 class="text-xl font-black text-slate-900 leading-snug">
+                半反應式平衡法
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                氧化數變化量 &rarr; 電子得失 &rarr; 電量守恆 &rarr; 原子不滅，隨機抽題逐步引導。
+              </p>
+            </div>
+          </div>
+          <div class="pt-6 mt-4 border-t border-slate-100 flex items-center justify-between text-sm font-extrabold text-emerald-700 group-hover:text-amber-700">
+            <span>開始逐步練習</span>
+            <span class="text-lg group-hover:translate-x-1 transition-transform">&rarr;</span>
+          </div>
+        </div>
+
+        <!-- 卡片 3 -->
+        <div onclick="switchTab(3)" class="group bg-white rounded-3xl p-6 sm:p-7 shadow-md hover:shadow-xl border-2 border-slate-200 hover:border-amber-400 cursor-pointer transition-all duration-300 flex flex-col justify-between hover:-translate-y-1">
+          <div class="space-y-4">
+            <div class="w-16 h-16 rounded-2xl bg-amber-50 group-hover:bg-amber-100 border border-amber-100 group-hover:border-amber-300 flex items-center justify-center text-4xl transition">
+              🧫
+            </div>
+            <div class="space-y-2">
+              <span class="text-xs font-extrabold text-amber-600 group-hover:text-amber-700 uppercase tracking-wider">關卡 3・實戰演練</span>
+              <h3 class="text-xl font-black text-slate-900 leading-snug">
+                全反應平衡法
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                精選段考經典方程式，隨機出題挑戰最簡整數係數平衡。
+              </p>
+            </div>
+          </div>
+          <div class="pt-6 mt-4 border-t border-slate-100 flex items-center justify-between text-sm font-extrabold text-amber-700">
+            <span>挑戰全反應平衡</span>
+            <span class="text-lg group-hover:translate-x-1 transition-transform">&rarr;</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
 
     <!-- ==================== 第一階段：常見氧化劑或還原劑對應變化 ==================== -->
-    <section id="stage-1" class="fade-in space-y-6">
+    <section id="stage-1" class="hidden fade-in space-y-5 sm:space-y-6">
       <!-- 控制面板 -->
-      <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div class="flex flex-wrap items-center gap-2" id="filter-group">
-          <button onclick="setFilter('all')" id="filter-all" class="filter-btn px-3.5 py-1.5 rounded-full text-sm font-semibold bg-slate-800 text-white transition">
-            全部情境 (23)
+          <button onclick="setFilter('all')" id="filter-all" class="filter-btn px-3.5 py-2 rounded-full text-xs sm:text-sm font-bold bg-slate-800 text-white transition">
+            常見的氧化/還原試劑
           </button>
-          <button onclick="setFilter('oxidizer')" id="filter-oxidizer" class="filter-btn px-3.5 py-1.5 rounded-full text-sm font-semibold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition">
-            常見氧化劑 (12)
+          <button onclick="setFilter('oxidizer')" id="filter-oxidizer" class="filter-btn px-3.5 py-2 rounded-full text-xs sm:text-sm font-bold bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition">
+            常見氧化劑
           </button>
-          <button onclick="setFilter('reducer')" id="filter-reducer" class="filter-btn px-3.5 py-1.5 rounded-full text-sm font-semibold bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition">
-            常見還原劑 (11)
+          <button onclick="setFilter('reducer')" id="filter-reducer" class="filter-btn px-3.5 py-2 rounded-full text-xs sm:text-sm font-bold bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition">
+            常見還原劑
           </button>
         </div>
 
-        <div class="flex items-center gap-2">
-          <button onclick="toggleMode('cards')" id="mode-cards" class="px-4 py-2 rounded-xl text-sm font-bold bg-indigo-600 text-white shadow-sm transition">
+        <div class="grid grid-cols-1 sm:grid-cols-3 lg:flex items-center gap-2">
+          <button onclick="toggleMode('cards')" id="mode-cards" class="px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 text-white shadow-sm transition text-center">
             🃏 翻卡記憶模式
           </button>
-          <button onclick="toggleMode('quiz')" id="mode-quiz" class="px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-sm transition">
+          <button onclick="toggleMode('quiz')" id="mode-quiz" class="px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 hover:bg-amber-600 text-white shadow-sm transition text-center">
             ⚡ 氧化數變化測驗
+          </button>
+          <button onclick="toggleMode('mistakes')" id="mode-mistakes" class="px-3.5 sm:px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border-2 border-rose-200 shadow-sm transition text-center flex items-center justify-center gap-1.5">
+            <span>📕 錯題練習區</span>
+            <span id="mistake-count-badge" class="px-2 py-0.5 rounded-full text-[11px] font-black bg-rose-600 text-white">0</span>
           </button>
         </div>
       </div>
 
       <!-- 模式 A：翻卡記憶網格 -->
-      <div id="cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div id="cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         <!-- 由 JS 動態生成 -->
       </div>
 
-      <!-- 模式 B：氧化數變化測驗 -->
+      <!-- 模式 B：氧化數變化測驗 & 錯題練習區共用容器 -->
       <div id="quiz-container" class="hidden max-w-2xl mx-auto">
         
         <!-- B-1：測驗目標設定畫面 -->
-        <div id="quiz-setup-box" class="bg-white rounded-2xl p-6 md:p-8 shadow-md border border-slate-200 space-y-6">
+        <div id="quiz-setup-box" class="bg-white rounded-2xl p-5 sm:p-8 shadow-md border border-slate-200 space-y-6">
           <div class="text-center space-y-2 border-b border-slate-100 pb-5">
-            <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">⚡ 氧化數變化測驗</span>
-            <h2 class="text-2xl font-black text-slate-800">選擇本次挑戰目標</h2>
-            <p class="text-sm text-slate-500">設定明確的題數或倒數時間，完成後可檢視成績單與錯題解析</p>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">⚡ 氧化數變化測驗（69 題隨機不重複題庫）</span>
+            <h2 class="text-xl sm:text-2xl font-black text-slate-800">選擇本次挑戰目標</h2>
+            <p class="text-xs sm:text-sm text-slate-500">每次洗牌出題順序皆不同，答錯的題目會自動收入錯題練習區</p>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- 方式一：指定題數 -->
-            <div class="border-2 border-indigo-100 bg-indigo-50/40 rounded-2xl p-5 space-y-4">
+            <div class="border-2 border-indigo-100 bg-indigo-50/40 rounded-2xl p-4 sm:p-5 space-y-4">
               <div class="flex items-center gap-2">
                 <span class="text-xl">🎯</span>
                 <div>
                   <h3 class="font-bold text-slate-800">指定題數挑戰</h3>
-                  <p class="text-xs text-slate-500">同回合題目不重複，做完即結算</p>
+                  <p class="text-xs text-slate-500">洗牌出題不重複，做完即結算</p>
                 </div>
               </div>
               <div class="grid grid-cols-3 gap-2">
@@ -143,12 +303,12 @@
             </div>
 
             <!-- 方式二：倒數計時 -->
-            <div class="border-2 border-amber-100 bg-amber-50/40 rounded-2xl p-5 space-y-4">
+            <div class="border-2 border-amber-100 bg-amber-50/40 rounded-2xl p-4 sm:p-5 space-y-4">
               <div class="flex items-center gap-2">
                 <span class="text-xl">⏱️</span>
                 <div>
                   <h3 class="font-bold text-slate-800">限時倒數衝刺</h3>
-                  <p class="text-xs text-slate-500">挑戰時間結束前能答對幾題</p>
+                  <p class="text-xs text-slate-500">時間內看你能答對幾題</p>
                 </div>
               </div>
               <div class="grid grid-cols-3 gap-2">
@@ -166,23 +326,23 @@
           </div>
         </div>
 
-        <!-- B-2：測驗作答區 -->
-        <div id="quiz-active-box" class="hidden bg-white rounded-2xl p-6 md:p-8 shadow-md border border-slate-200 space-y-6">
+        <!-- B-2：測驗與錯題作答區 -->
+        <div id="quiz-active-box" class="hidden bg-white rounded-2xl p-5 sm:p-8 shadow-md border border-slate-200 space-y-6">
           <div class="space-y-3 border-b border-slate-100 pb-4">
-            <div class="flex items-center justify-between">
+            <div class="flex flex-wrap items-center justify-between gap-2">
               <div class="flex items-center gap-2">
-                <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">氧化數變化測驗</span>
+                <span id="quiz-mode-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">氧化數變化測驗</span>
                 <span id="quiz-progress-badge" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700">第 1 / 10 題</span>
               </div>
-              <div class="flex items-center gap-4">
-                <div id="quiz-timer-display" class="hidden font-mono font-black text-base px-3 py-1 rounded-lg bg-slate-900 text-amber-400">
+              <div class="flex items-center gap-3 sm:gap-4">
+                <div id="quiz-timer-display" class="hidden font-mono font-black text-sm sm:text-base px-2.5 sm:px-3 py-1 rounded-lg bg-slate-900 text-amber-400">
                   02:00
                 </div>
-                <div class="text-sm font-bold text-slate-600">
-                  答對：<span id="quiz-score" class="text-indigo-600 text-lg">0</span> 題
+                <div class="text-xs sm:text-sm font-bold text-slate-600" id="quiz-score-box">
+                  答對：<span id="quiz-score" class="text-indigo-600 text-base sm:text-lg">0</span> 題
                 </div>
-                <button onclick="resetQuizToSetup()" class="text-xs text-slate-400 hover:text-slate-600 underline" title="重新設定題數或時間">
-                  重設
+                <button onclick="resetQuizToSetup()" class="text-xs text-slate-400 hover:text-slate-600 underline" title="返回設定">
+                  結束
                 </button>
               </div>
             </div>
@@ -193,7 +353,7 @@
 
           <div id="quiz-question-box" class="space-y-2">
             <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider" id="quiz-type-label">題型</p>
-            <h2 class="text-xl md:text-2xl font-bold text-slate-800 leading-relaxed chem-formula" id="quiz-question">
+            <h2 class="text-lg sm:text-2xl font-bold text-slate-800 leading-relaxed chem-formula" id="quiz-question">
               載入題目中...
             </h2>
           </div>
@@ -202,68 +362,117 @@
             <!-- 選項按鈕 -->
           </div>
 
-          <div id="quiz-feedback" class="hidden p-4 rounded-xl text-sm leading-relaxed"></div>
+          <div id="quiz-feedback" class="hidden p-4 rounded-xl text-xs sm:text-sm leading-relaxed"></div>
 
           <div class="flex justify-end pt-2">
-            <button onclick="nextQuiz()" id="quiz-next-btn" class="hidden px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow transition">
+            <button onclick="nextQuiz()" id="quiz-next-btn" class="hidden w-full sm:w-auto px-5 py-3 sm:py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow transition">
               下一題 &rarr;
             </button>
           </div>
         </div>
 
-        <!-- B-3：測驗結算成績單 -->
-        <div id="quiz-summary-box" class="hidden bg-white rounded-2xl p-6 md:p-8 shadow-md border border-slate-200 space-y-6">
-          <div class="text-center space-y-2 border-b border-slate-100 pb-5">
-            <div class="text-4xl mb-1" id="summary-emoji">🎉</div>
-            <h2 class="text-2xl font-black text-slate-800" id="summary-title">測驗完成！</h2>
-            <p class="text-sm text-slate-500" id="summary-subtitle">本次練習結算報告</p>
+        <!-- B-3：測驗結算成績單（搭配可愛實驗室小插圖 + 中央彈出短句 + 錯題練習入口） -->
+        <div id="quiz-summary-box" class="hidden bg-white rounded-2xl p-5 sm:p-8 shadow-md border border-slate-200 space-y-6">
+          <div class="bg-gradient-to-br from-amber-50 via-white to-indigo-50 border-2 border-amber-200/80 rounded-3xl p-5 sm:p-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
+            <div id="summary-illustration" class="w-24 h-24 shrink-0 float-anim flex items-center justify-center">
+              <!-- 由 JS 動態注入可愛 SVG 小插圖 -->
+            </div>
+            <div class="space-y-1.5 flex-1">
+              <div class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-amber-200/80 text-amber-950" id="summary-subtitle">
+                挑戰結算
+              </div>
+              <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight" id="summary-encourage-main">
+                氧化還原大師就是你！✨
+              </h2>
+            </div>
           </div>
 
-          <div class="grid grid-cols-3 gap-3 text-center">
-            <div class="bg-indigo-50 rounded-2xl p-4">
+          <div class="grid grid-cols-3 gap-2 sm:gap-3 text-center">
+            <div class="bg-indigo-50 rounded-2xl p-3 sm:p-4">
               <div class="text-xs font-semibold text-indigo-600">答對題數</div>
-              <div class="text-2xl font-black text-indigo-900 mt-1"><span id="sum-correct">0</span> <span class="text-sm font-bold text-indigo-400">/ <span id="sum-total">10</span></span></div>
+              <div class="text-xl sm:text-2xl font-black text-indigo-900 mt-1"><span id="sum-correct">0</span> <span class="text-xs sm:text-sm font-bold text-indigo-400">/ <span id="sum-total">10</span></span></div>
             </div>
-            <div class="bg-emerald-50 rounded-2xl p-4">
+            <div class="bg-emerald-50 rounded-2xl p-3 sm:p-4">
               <div class="text-xs font-semibold text-emerald-600">正確率</div>
-              <div class="text-2xl font-black text-emerald-900 mt-1" id="sum-accuracy">0%</div>
+              <div class="text-xl sm:text-2xl font-black text-emerald-900 mt-1" id="sum-accuracy">0%</div>
             </div>
-            <div class="bg-amber-50 rounded-2xl p-4">
+            <div class="bg-amber-50 rounded-2xl p-3 sm:p-4">
               <div class="text-xs font-semibold text-amber-600">耗時</div>
-              <div class="text-2xl font-black text-amber-900 mt-1" id="sum-time">0 秒</div>
+              <div class="text-xl sm:text-2xl font-black text-amber-900 mt-1" id="sum-time">0 秒</div>
             </div>
           </div>
 
           <div id="summary-mistakes-section" class="space-y-3">
-            <h3 class="text-sm font-bold text-slate-700">📌 本次需加強的觀念（錯題回顧）：</h3>
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-700">📌 本次錯題快覽（已自動收錄至錯題練習區）：</h3>
+            </div>
             <div id="summary-mistakes-list" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
               <!-- JS 動態生成 -->
             </div>
           </div>
 
-          <div class="flex flex-wrap justify-center gap-3 pt-2">
-            <button onclick="resetQuizToSetup()" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow transition">
+          <div class="flex flex-col sm:flex-row justify-center gap-3 pt-2">
+            <button id="summary-retry-mistakes-btn" onclick="toggleMode('mistakes')" class="hidden px-6 py-3 sm:py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow transition">
+              📕 立即複習錯題
+            </button>
+            <button onclick="resetQuizToSetup()" class="px-6 py-3 sm:py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow transition">
               🔄 再測驗一次
             </button>
-            <button onclick="toggleMode('cards')" class="px-6 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-sm transition">
+            <button onclick="toggleMode('cards')" class="px-6 py-3 sm:py-2.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-sm transition">
               🃏 回到翻卡複習
             </button>
+          </div>
+        </div>
+
+        <!-- B-4：錯題練習區總覽面板 -->
+        <div id="mistakes-hub-box" class="hidden bg-white rounded-2xl p-5 sm:p-8 shadow-md border border-slate-200 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+            <div class="space-y-1">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800">📕 專屬錯題練習區</span>
+              <h2 class="text-xl sm:text-2xl font-black text-slate-800 pt-1">
+                目前待消滅錯題：<span id="hub-mistake-total" class="text-rose-600">0</span> 題
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-500">重新挑戰錯題並答對後，系統會自動幫你把該題移除！</p>
+            </div>
+            <div id="hub-action-btns" class="flex flex-col sm:flex-row gap-2 shrink-0">
+              <button onclick="startMistakePractice()" class="px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm shadow transition">
+                🔥 開始消滅錯題
+              </button>
+              <button onclick="clearAllMistakes()" class="px-4 py-3 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-600 font-bold text-xs sm:text-sm transition">
+                🗑️ 清空全部
+              </button>
+            </div>
+          </div>
+
+          <!-- 無錯題時的空白狀態 -->
+          <div id="mistakes-empty-state" class="py-8 text-center space-y-4">
+            <div class="w-24 h-24 mx-auto float-anim" id="empty-mistake-illustration"></div>
+            <h3 class="text-lg sm:text-xl font-black text-slate-800">太棒了！目前沒有任何錯題 ✨</h3>
+            <p class="text-xs sm:text-sm text-slate-500">去「氧化數變化測驗」挑戰看看，答錯的題目會自動出現在這裡喔！</p>
+            <button onclick="toggleMode('quiz')" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow transition">
+              ⚡ 前往氧化數變化測驗
+            </button>
+          </div>
+
+          <!-- 錯題清單預覽 -->
+          <div id="hub-mistakes-list" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+            <!-- JS 動態生成 -->
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- ==================== 第二階段：半反應式五步驟引導 ==================== -->
-    <section id="stage-2" class="hidden fade-in space-y-6">
+    <!-- ==================== 第二階段：半反應式平衡法 ==================== -->
+    <section id="stage-2" class="hidden fade-in space-y-5 sm:space-y-6">
       <!-- 題目選擇器 -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+      <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
-            <h2 class="text-lg font-bold text-slate-800">半反應式平衡引導（氧化數變化量 &rarr; 電子得失 &rarr; 電量守恆 &rarr; 原子不滅）</h2>
-            <p class="text-sm text-slate-500">依據講義平衡順序，逐步完成氧化數判別、電子轉移、電量守恆與原子不滅檢核</p>
+            <h2 class="text-base sm:text-lg font-bold text-slate-800">半反應式平衡引導（氧化數變化量 &rarr; 電子得失 &rarr; 電量守恆 &rarr; 原子不滅）</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">每次進入隨機抽題不重複，逐步完成氧化數判別、電子轉移、電量守恆與原子不滅檢核</p>
           </div>
-          <select id="half-rxn-select" onchange="loadHalfReaction(this.value)" class="px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <select id="half-rxn-select" onchange="loadHalfReaction(this.value)" class="w-full md:w-auto px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400">
             <option value="0">題型 1（酸性）：過錳酸根還原 (MnO₄⁻ → Mn²⁺)</option>
             <option value="1">題型 2（酸性）：二鉻酸根還原 (Cr₂O₇²⁻ → Cr³⁺)</option>
             <option value="2">題型 3（中性/微鹼）：過錳酸根生成二氧化錳 (MnO₄⁻ → MnO₂)</option>
@@ -273,56 +482,158 @@
         </div>
 
         <!-- 題幹提示區 -->
-        <div class="bg-indigo-50/70 border border-indigo-100 rounded-xl p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+        <div class="bg-emerald-50/70 border border-emerald-200/80 rounded-xl p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-2">
           <div class="flex items-center flex-wrap gap-2">
-            <span class="text-xs font-bold px-2.5 py-0.5 rounded bg-indigo-600 text-white" id="hr-env-badge">酸性環境</span>
-            <span class="text-lg font-black text-slate-800 chem-formula" id="hr-title"></span>
+            <span class="text-xs font-bold px-2.5 py-0.5 rounded bg-emerald-700 text-white" id="hr-env-badge">酸性環境</span>
+            <span class="text-base sm:text-lg font-black text-slate-800 chem-formula" id="hr-title"></span>
           </div>
-          <div class="text-xs text-indigo-800 font-semibold" id="hr-hint"></div>
+          <div class="text-xs text-emerald-900 font-semibold leading-relaxed" id="hr-hint"></div>
         </div>
       </div>
 
       <!-- 步驟進度條 -->
-      <div class="grid grid-cols-5 gap-2" id="step-indicators">
+      <div class="grid grid-cols-5 gap-1.5 sm:gap-2" id="step-indicators">
         <!-- JS 生成 -->
       </div>
 
       <!-- 互動步驟卡片 -->
-      <div class="bg-white rounded-2xl p-6 md:p-8 shadow-md border border-slate-200 space-y-6" id="step-workspace">
+      <div class="bg-white rounded-2xl p-5 sm:p-8 shadow-md border border-slate-200 space-y-6" id="step-workspace">
         <!-- JS 動態渲染當前步驟 -->
       </div>
     </section>
 
-    <!-- ==================== 第三階段：全反應綜合平衡 ==================== -->
-    <section id="stage-3" class="hidden fade-in space-y-6">
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <!-- ==================== 第三階段：全反應平衡法 ==================== -->
+    <section id="stage-3" class="hidden fade-in space-y-5 sm:space-y-6">
+      <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-lg font-bold text-slate-800">段考／分科測驗｜全反應係數平衡挑戰</h2>
-          <p class="text-sm text-slate-500">利用「得電子總數 ＝ 失電子總數」快速求算最簡整數係數</p>
+          <h2 class="text-base sm:text-lg font-bold text-slate-800">段考／分科測驗｜全反應係數平衡挑戰</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">每次進入隨機輪播不重複，利用「得電子總數 ＝ 失電子總數」求算最簡整數係數</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button onclick="prevFullRxn()" class="px-3.5 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-sm font-bold">&larr; 上一題</button>
-          <span class="text-sm font-bold px-3 py-1.5 bg-slate-100 rounded-lg" id="full-rxn-counter">1 / 4</span>
-          <button onclick="nextFullRxn()" class="px-3.5 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-sm font-bold">下一題 &rarr;</button>
+        <div class="flex items-center justify-between sm:justify-end gap-2">
+          <button onclick="prevFullRxn()" class="px-3.5 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-xs sm:text-sm font-bold">&larr; 上一題</button>
+          <span class="text-xs sm:text-sm font-bold px-3 py-1.5 bg-slate-100 rounded-lg" id="full-rxn-counter">1 / 4</span>
+          <button onclick="nextFullRxn()" class="px-3.5 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-xs sm:text-sm font-bold">下一題 &rarr;</button>
         </div>
       </div>
 
-      <div class="bg-white rounded-2xl p-6 md:p-8 shadow-md border border-slate-200 space-y-6" id="full-rxn-workspace">
+      <div class="bg-white rounded-2xl p-5 sm:p-8 shadow-md border border-slate-200 space-y-6" id="full-rxn-workspace">
         <!-- JS 動態生成 -->
       </div>
     </section>
 
   </main>
 
-  <footer class="text-center text-xs text-slate-500 py-6 border-t border-slate-200/60 mt-10 space-y-1.5">
+  <footer class="text-center text-xs text-slate-500 py-6 px-4 border-t border-slate-200/60 mt-10 space-y-1.5">
     <div class="font-medium text-slate-600">高三選修化學 IV｜氧化還原反應教學輔助工具</div>
-    <div>
+    <div class="leading-relaxed">
       設計者：Miley ｜ 若有任何指正或教學建議，敬請不吝賜教：
-      <a href="mailto:r97223148@ptgsh.ptc.edu.tw" class="text-indigo-600 hover:underline font-medium">r97223148@ptgsh.ptc.edu.tw</a>
+      <a href="mailto:r97223148@ptgsh.ptc.edu.tw" class="text-indigo-600 hover:underline font-medium break-all">r97223148@ptgsh.ptc.edu.tw</a>
     </div>
   </footer>
 
+  <!-- 畫面正中央情緒價值閃動彈出容器 -->
+  <div id="center-praise-layer"></div>
+
   <script>
+    // ==================== Fisher-Yates 真隨機洗牌演算法 ====================
+    function shuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    // ==================== 畫面正中央情緒價值閃動漸大消失特效 ====================
+    const praiseList = [
+      '讚讚！🎉',
+      '你好棒！👏',
+      '優秀！✨',
+      '有夠厲害！🔥',
+      'Good！👍',
+      'Great！🌟',
+      'Excellent！🏆'
+    ];
+
+    function getRandomPraise() {
+      return praiseList[Math.floor(Math.random() * praiseList.length)];
+    }
+
+    function triggerCenterPraise(customText = null, theme = 'gold') {
+      const layer = document.getElementById('center-praise-layer');
+      const text = customText || getRandomPraise();
+
+      const themeStyle = theme === 'encourage'
+        ? 'from-rose-500 via-amber-500 to-orange-500 border-amber-200 shadow-amber-500/40'
+        : 'from-indigo-600 via-amber-500 to-emerald-500 border-amber-200 shadow-amber-400/50';
+
+      const badge = document.createElement('div');
+      badge.className = `praise-pop-effect px-7 py-4 sm:px-9 sm:py-5 rounded-3xl bg-gradient-to-r ${themeStyle} text-white font-black text-2xl sm:text-4xl tracking-wider border-4 shadow-2xl whitespace-nowrap`;
+      badge.innerText = text;
+
+      layer.innerHTML = '';
+      layer.appendChild(badge);
+
+      setTimeout(() => {
+        if (badge.parentNode) badge.remove();
+      }, 1500);
+    }
+
+    // ==================== 可愛實驗室 SVG 小插圖庫 ====================
+    const cuteIllustrations = {
+      trophyFlask: `
+        <svg viewBox="0 0 120 120" class="w-full h-full drop-shadow-sm">
+          <circle cx="60" cy="62" r="48" fill="#FEF3C7"/>
+          <path d="M22 36 L25 42 L31 43 L26 47 L28 53 L22 50 L16 53 L18 47 L13 43 L19 42 Z" fill="#F59E0B"/>
+          <path d="M98 32 L100 37 L105 38 L101 41 L102 46 L98 43 L94 46 L95 41 L91 38 L96 37 Z" fill="#F59E0B"/>
+          <path d="M45 24 L50 14 L60 21 L70 14 L75 24 Z" fill="#FBBF24" stroke="#B45309" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M51 30 L69 30 L69 46 L90 88 C92 92 89 97 84 97 L36 97 C31 97 28 92 30 88 L51 46 Z" fill="#FFFFFF" stroke="#334155" stroke-width="3.5" stroke-linejoin="round"/>
+          <rect x="47" y="26" width="26" height="6" rx="3" fill="#E2E8F0" stroke="#334155" stroke-width="3"/>
+          <path d="M40 72 L80 72 L87 87 C88 90 86 93 83 93 L37 93 C34 93 32 90 33 87 Z" fill="#FDE047"/>
+          <circle cx="52" cy="64" r="3" fill="#F59E0B"/>
+          <circle cx="67" cy="58" r="2.5" fill="#F59E0B"/>
+          <path d="M48 80 Q51 76 54 80" stroke="#1E293B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M66 80 Q69 76 72 80" stroke="#1E293B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M55 84 Q60 90 65 84" stroke="#1E293B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <circle cx="45" cy="83" r="3" fill="#FDA4AF" opacity="0.8"/>
+          <circle cx="75" cy="83" r="3" fill="#FDA4AF" opacity="0.8"/>
+        </svg>
+      `,
+      happyBeaker: `
+        <svg viewBox="0 0 120 120" class="w-full h-full drop-shadow-sm">
+          <circle cx="60" cy="62" r="48" fill="#E0E7FF"/>
+          <path d="M36 32 L84 32 L84 88 C84 93 80 97 75 97 L45 97 C40 97 36 93 36 88 Z" fill="#FFFFFF" stroke="#334155" stroke-width="3.5" stroke-linejoin="round"/>
+          <path d="M32 32 L88 32" stroke="#334155" stroke-width="4" stroke-linecap="round"/>
+          <path d="M39 60 L81 60 L81 87 C81 91 78 94 74 94 L46 94 C42 94 39 91 39 87 Z" fill="#6EE7B7"/>
+          <line x1="42" y1="45" x2="50" y2="45" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="42" y1="55" x2="48" y2="55" stroke="#64748B" stroke-width="2.5" stroke-linecap="round"/>
+          <line x1="42" y1="65" x2="50" y2="65" stroke="#065F46" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="68" cy="48" r="3.5" fill="#34D399"/>
+          <circle cx="58" cy="40" r="2.5" fill="#34D399"/>
+          <circle cx="52" cy="75" r="2.5" fill="#1E293B"/>
+          <circle cx="68" cy="75" r="2.5" fill="#1E293B"/>
+          <path d="M55 81 Q60 86 65 81" stroke="#1E293B" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <circle cx="47" cy="79" r="3" fill="#FDA4AF" opacity="0.8"/>
+          <circle cx="73" cy="79" r="3" fill="#FDA4AF" opacity="0.8"/>
+        </svg>
+      `,
+      sproutTube: `
+        <svg viewBox="0 0 120 120" class="w-full h-full drop-shadow-sm">
+          <circle cx="60" cy="62" r="48" fill="#FCE7F3"/>
+          <path d="M60 46 L60 28" stroke="#16A34A" stroke-width="3" stroke-linecap="round"/>
+          <path d="M60 33 C50 25 44 31 52 38 C56 40 60 36 60 33 Z" fill="#4ADE80" stroke="#15803D" stroke-width="1.5"/>
+          <path d="M60 30 C70 22 76 28 68 35 C64 37 60 33 60 30 Z" fill="#4ADE80" stroke="#15803D" stroke-width="1.5"/>
+          <path d="M46 44 L74 44 L74 82 C74 90 68 96 60 96 C52 96 46 90 46 82 Z" fill="#FFFFFF" stroke="#334155" stroke-width="3.5"/>
+          <rect x="42" y="40" width="36" height="6" rx="3" fill="#E2E8F0" stroke="#334155" stroke-width="3"/>
+          <path d="M49 66 L71 66 L71 82 C71 88 66 93 60 93 C54 93 49 88 49 82 Z" fill="#F9A8D4"/>
+          <circle cx="54" cy="76" r="2.3" fill="#1E293B"/>
+          <circle cx="66" cy="76" r="2.3" fill="#1E293B"/>
+          <path d="M57 82 Q60 85 63 82" stroke="#1E293B" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        </svg>
+      `
+    };
+
     // ==================== 資料庫 1：講義完整氧化劑與還原劑 ====================
     const speciesData = [
       // --- 氧化劑 (12 組) ---
@@ -677,18 +988,18 @@
         const badgeColor = isOx ? 'bg-rose-100 text-rose-700' : 'bg-sky-100 text-sky-700';
 
         return `
-          <div onclick="this.querySelector('.card-inner').classList.toggle('rotate-y-180')" class="perspective-1000 h-64 cursor-pointer group">
+          <div onclick="this.querySelector('.card-inner').classList.toggle('rotate-y-180')" class="perspective-1000 h-60 sm:h-64 cursor-pointer group">
             <div class="card-inner relative w-full h-full transform-style-3d">
               
               <!-- 正面 -->
-              <div class="backface-hidden absolute inset-0 bg-white rounded-2xl p-5 shadow-sm border border-slate-200 group-hover:border-indigo-300 group-hover:shadow-md transition flex flex-col justify-between">
-                <div class="flex items-center justify-between">
+              <div class="backface-hidden absolute inset-0 bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 group-hover:border-amber-400 group-hover:shadow-md transition flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-2">
                   <span class="text-xs font-bold px-2.5 py-1 rounded-full ${badgeColor}">${badgeText}</span>
-                  <span class="text-xs text-slate-400">點擊翻面 ↻</span>
+                  <span class="text-xs text-slate-400 shrink-0">點擊翻面 ↻</span>
                 </div>
 
                 <div class="text-center my-auto space-y-3">
-                  <div class="text-2xl font-black text-slate-800 chem-formula">${item.name}</div>
+                  <div class="text-xl sm:text-2xl font-black text-slate-800 chem-formula">${item.name}</div>
                   <div class="inline-block text-xs font-semibold px-3 py-1.5 rounded-lg border ${item.colorTag}">
                     條件：${item.condition}
                   </div>
@@ -700,18 +1011,18 @@
               </div>
 
               <!-- 背面 -->
-              <div class="backface-hidden rotate-y-180 absolute inset-0 bg-slate-900 text-white rounded-2xl p-5 shadow-lg flex flex-col justify-between">
-                <div class="flex items-center justify-between border-b border-slate-700 pb-2">
-                  <span class="text-xs font-bold text-indigo-300">主要產物：<span class="text-white chem-formula">${item.product}</span></span>
-                  <span class="text-xs text-slate-400">點選返回 ↺</span>
+              <div class="backface-hidden rotate-y-180 absolute inset-0 bg-slate-900 text-white rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col justify-between">
+                <div class="flex items-center justify-between border-b border-slate-700 pb-2 gap-2">
+                  <span class="text-xs font-bold text-amber-300">主要產物：<span class="text-white chem-formula">${item.product}</span></span>
+                  <span class="text-xs text-slate-400 shrink-0">返回 ↺</span>
                 </div>
 
-                <div class="my-auto space-y-3">
-                  <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-3 text-center">
+                <div class="my-auto space-y-2.5">
+                  <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-2.5 sm:p-3 text-center">
                     <div class="text-[11px] text-slate-400 mb-1">標準半反應式</div>
-                    <div class="text-sm font-bold text-amber-300 chem-formula leading-relaxed">${item.halfRxn}</div>
+                    <div class="text-xs sm:text-sm font-bold text-amber-300 chem-formula leading-relaxed">${item.halfRxn}</div>
                   </div>
-                  <p class="text-xs text-slate-300 leading-relaxed">💡 ${item.note}</p>
+                  <p class="text-xs text-slate-300 leading-relaxed line-clamp-3">💡 ${item.note}</p>
                 </div>
 
                 <div class="flex justify-between text-[11px] text-slate-400 border-t border-slate-800 pt-2">
@@ -726,8 +1037,91 @@
       }).join('');
     }
 
-    // ==================== 氧化數變化測驗邏輯 ====================
-    let quizModeType = 'count';
+    // ==================== 展平 69 題全題庫（確保跨回合與同回合皆不重複） ====================
+    const allQuizItems = [];
+    speciesData.forEach(item => {
+      // 題型 0：反應產物判斷
+      allQuizItems.push({
+        uid: `${item.id}_q0`,
+        species: item,
+        qType: 0,
+        typeLabel: '題型一：反應產物判斷',
+        questionHTML: `物種 <span class="text-indigo-600">${item.name}</span> 在「${item.condition}」下反應，主要會生成何種產物？`,
+        summaryPrompt: `${item.name}（${item.condition}）→ 產物為何？`,
+        correctAnswer: item.product
+      });
+      // 題型 1：電子轉移莫耳數
+      allQuizItems.push({
+        uid: `${item.id}_q1`,
+        species: item,
+        qType: 1,
+        typeLabel: '題型二：電子轉移莫耳數（僅選數字）',
+        questionHTML: `1 莫耳的 <span class="text-indigo-600">${item.name}</span> 在「${item.condition}」下完全反應，共轉移多少莫耳電子？`,
+        summaryPrompt: `1 mol ${item.name}（${item.condition}）轉移幾 mol e⁻？`,
+        correctAnswer: item.electronNum
+      });
+      // 題型 2：畫底線原子氧化數變化
+      allQuizItems.push({
+        uid: `${item.id}_q2`,
+        species: item,
+        qType: 2,
+        typeLabel: '題型三：畫底線原子氧化數變化',
+        questionHTML: `<span class="text-indigo-600">${item.underlinedName}</span> 在「${item.condition}」下反應時，其核心（畫底線）原子的氧化數變化為何？`,
+        summaryPrompt: `${item.underlinedName}（${item.condition}）氧化數變化？`,
+        correctAnswer: item.oxChange
+      });
+    });
+
+    // 全域不重複抽題池（跨回合持續消耗，直到 69 題全部出完才重新洗牌）
+    let globalDeck = shuffle([...allQuizItems]);
+
+    function drawUniqueQuizItem(excludeUidsSet = new Set()) {
+      if (globalDeck.length === 0) {
+        globalDeck = shuffle([...allQuizItems]);
+      }
+      // 優先從尚未在本回合出現過的題目中抽取
+      const validIdx = globalDeck.findIndex(q => !excludeUidsSet.has(q.uid));
+      if (validIdx !== -1) {
+        const [picked] = globalDeck.splice(validIdx, 1);
+        return picked;
+      }
+      // 若極端情況全抽過則重洗
+      globalDeck = shuffle([...allQuizItems]);
+      return globalDeck.pop();
+    }
+
+    // ==================== 錯題本資料庫（跨回合保存與消滅機制） ====================
+    // Map: uid -> { quizItem, lastUserAns }
+    const savedMistakesMap = new Map();
+
+    function updateMistakeBadge() {
+      const count = savedMistakesMap.size;
+      document.getElementById('mistake-count-badge').innerText = count;
+    }
+
+    function recordMistake(quizItem, userAns) {
+      savedMistakesMap.set(quizItem.uid, {
+        quizItem,
+        lastUserAns: userAns
+      });
+      updateMistakeBadge();
+    }
+
+    function removeMistake(uid) {
+      if (savedMistakesMap.has(uid)) {
+        savedMistakesMap.delete(uid);
+        updateMistakeBadge();
+      }
+    }
+
+    function clearAllMistakes() {
+      savedMistakesMap.clear();
+      updateMistakeBadge();
+      renderMistakesHub();
+    }
+
+    // ==================== 氧化數變化測驗 & 錯題練習邏輯 ====================
+    let quizModeType = 'count'; // 'count' | 'timer' | 'mistake'
     let quizTargetCount = 10;
     let quizTimeLimit = 120;
     let quizTimeLeft = 120;
@@ -736,25 +1130,35 @@
 
     let quizScore = 0;
     let quizAnsweredCount = 0;
-    let quizQuestionPool = [];
-    let quizMistakes = [];
+    let sessionUsedUids = new Set();
+    let sessionMistakes = [];
+    let mistakePracticeQueue = [];
 
+    let currentQuizItem = null;
     let currentQuizOptions = [];
     let currentQuizCorrectIndex = 0;
     let currentQuizExplain = '';
-    let currentQuizSummaryPrompt = '';
 
     function toggleMode(mode) {
+      stopQuizTimer();
+      const cardsEl = document.getElementById('cards-container');
+      const filterEl = document.getElementById('filter-group');
+      const quizContainer = document.getElementById('quiz-container');
+
       if (mode === 'cards') {
-        stopQuizTimer();
-        document.getElementById('cards-container').classList.remove('hidden');
-        document.getElementById('filter-group').classList.remove('invisible');
-        document.getElementById('quiz-container').classList.add('hidden');
-      } else {
-        document.getElementById('cards-container').classList.add('hidden');
-        document.getElementById('filter-group').classList.add('invisible');
-        document.getElementById('quiz-container').classList.remove('hidden');
+        cardsEl.classList.remove('hidden');
+        filterEl.classList.remove('hidden');
+        quizContainer.classList.add('hidden');
+      } else if (mode === 'quiz') {
+        cardsEl.classList.add('hidden');
+        filterEl.classList.add('hidden');
+        quizContainer.classList.remove('hidden');
         resetQuizToSetup();
+      } else if (mode === 'mistakes') {
+        cardsEl.classList.add('hidden');
+        filterEl.classList.add('hidden');
+        quizContainer.classList.remove('hidden');
+        openMistakesHub();
       }
     }
 
@@ -765,25 +1169,94 @@
       }
     }
 
-    function resetQuizToSetup() {
-      stopQuizTimer();
-      document.getElementById('quiz-setup-box').classList.remove('hidden');
+    function hideAllQuizBoxes() {
+      document.getElementById('quiz-setup-box').classList.add('hidden');
       document.getElementById('quiz-active-box').classList.add('hidden');
       document.getElementById('quiz-summary-box').classList.add('hidden');
+      document.getElementById('mistakes-hub-box').classList.add('hidden');
+    }
+
+    function resetQuizToSetup() {
+      stopQuizTimer();
+      hideAllQuizBoxes();
+      document.getElementById('quiz-setup-box').classList.remove('hidden');
+    }
+
+    function openMistakesHub() {
+      stopQuizTimer();
+      hideAllQuizBoxes();
+      document.getElementById('mistakes-hub-box').classList.remove('hidden');
+      renderMistakesHub();
+    }
+
+    function renderMistakesHub() {
+      const count = savedMistakesMap.size;
+      document.getElementById('hub-mistake-total').innerText = count;
+      const emptyEl = document.getElementById('mistakes-empty-state');
+      const listEl = document.getElementById('hub-mistakes-list');
+      const actionBtns = document.getElementById('hub-action-btns');
+
+      if (count === 0) {
+        emptyEl.classList.remove('hidden');
+        listEl.classList.add('hidden');
+        actionBtns.classList.add('hidden');
+        document.getElementById('empty-mistake-illustration').innerHTML = cuteIllustrations.trophyFlask;
+      } else {
+        emptyEl.classList.add('hidden');
+        listEl.classList.remove('hidden');
+        actionBtns.classList.remove('hidden');
+
+        listEl.innerHTML = Array.from(savedMistakesMap.values()).map((entry, idx) => {
+          const q = entry.quizItem;
+          return `
+            <div class="p-4 rounded-2xl bg-rose-50/60 border border-rose-200 text-xs sm:text-sm space-y-1.5">
+              <div class="flex items-start justify-between gap-2">
+                <div class="font-bold text-slate-800 chem-formula">${idx + 1}. ${q.summaryPrompt}</div>
+                <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-rose-100 text-rose-700 shrink-0">${q.typeLabel.split('：')[1]}</span>
+              </div>
+              <div class="flex flex-wrap gap-3 text-xs">
+                <span class="text-rose-700">上次誤選：<strong class="chem-formula">${entry.lastUserAns}</strong></span>
+                <span class="text-emerald-700">正確答案：<strong class="chem-formula">${q.correctAnswer}</strong></span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function startMistakePractice() {
+      if (savedMistakesMap.size === 0) return;
+      quizModeType = 'mistake';
+      quizScore = 0;
+      quizAnsweredCount = 0;
+      sessionMistakes = [];
+      mistakePracticeQueue = shuffle(Array.from(savedMistakesMap.values()).map(e => e.quizItem));
+      quizTargetCount = mistakePracticeQueue.length;
+      quizStartTime = Date.now();
+
+      hideAllQuizBoxes();
+      document.getElementById('quiz-active-box').classList.remove('hidden');
+      document.getElementById('quiz-timer-display').classList.add('hidden');
+      document.getElementById('quiz-mode-badge').innerText = '📕 錯題特訓模式';
+      document.getElementById('quiz-mode-badge').className = 'px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800';
+      document.getElementById('quiz-score').innerText = '0';
+
+      generateQuiz();
     }
 
     function startQuizSession(type, value) {
       quizModeType = type;
       quizScore = 0;
       quizAnsweredCount = 0;
-      quizMistakes = [];
-      quizQuestionPool = shuffle([...speciesData]);
+      sessionUsedUids = new Set();
+      sessionMistakes = [];
       quizStartTime = Date.now();
 
-      document.getElementById('quiz-score').innerText = '0';
-      document.getElementById('quiz-setup-box').classList.add('hidden');
-      document.getElementById('quiz-summary-box').classList.add('hidden');
+      hideAllQuizBoxes();
       document.getElementById('quiz-active-box').classList.remove('hidden');
+      document.getElementById('quiz-mode-badge').innerText = '⚡ 氧化數變化測驗';
+      document.getElementById('quiz-mode-badge').className = 'px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800';
+      document.getElementById('quiz-score').innerText = '0';
 
       const timerEl = document.getElementById('quiz-timer-display');
       if (type === 'count') {
@@ -805,7 +1278,7 @@
             timerEl.classList.add('text-rose-400', 'animate-pulse');
           }
           if (quizTimeLeft <= 0) {
-            finishQuizSession('時間到！');
+            finishQuizSession();
           }
         }, 1000);
       }
@@ -824,11 +1297,11 @@
       document.getElementById('quiz-next-btn').classList.add('hidden');
 
       const currentNum = quizAnsweredCount + 1;
-      if (quizModeType === 'count') {
+      if (quizModeType === 'count' || quizModeType === 'mistake') {
         document.getElementById('quiz-progress-badge').innerText = `第 ${currentNum} / ${quizTargetCount} 題`;
         const pct = Math.min(100, Math.round((quizAnsweredCount / quizTargetCount) * 100));
         document.getElementById('quiz-progress-bar').style.width = `${pct}%`;
-        document.getElementById('quiz-next-btn').innerText = currentNum >= quizTargetCount ? '查看測驗結果 →' : '下一題 →';
+        document.getElementById('quiz-next-btn').innerText = currentNum >= quizTargetCount ? '查看結算結果 →' : '下一題 →';
       } else {
         document.getElementById('quiz-progress-badge').innerText = `已作答 ${quizAnsweredCount} 題（第 ${currentNum} 題）`;
         const pct = Math.max(0, Math.round((quizTimeLeft / quizTimeLimit) * 100));
@@ -836,51 +1309,43 @@
         document.getElementById('quiz-next-btn').innerText = '下一題 →';
       }
 
-      if (quizQuestionPool.length === 0) {
-        quizQuestionPool = shuffle([...speciesData]);
-      }
-      const target = quizQuestionPool.pop();
-      const qType = Math.floor(Math.random() * 3);
-
-      let questionHTML = '';
-      let correctAnswer = '';
-      let options = [];
-
-      if (qType === 0) {
-        document.getElementById('quiz-type-label').innerText = '題型一：反應產物判斷';
-        questionHTML = `物種 <span class="text-indigo-600">${target.name}</span> 在「${target.condition}」下反應，主要會生成何種產物？`;
-        currentQuizSummaryPrompt = `${target.name}（${target.condition}）→ 產物為何？`;
-        correctAnswer = target.product;
-        const pool = [...new Set(speciesData.map(d => d.product))].filter(p => p !== correctAnswer);
-        options = shuffle([correctAnswer, ...shuffle(pool).slice(0, 3)]);
-      } else if (qType === 1) {
-        document.getElementById('quiz-type-label').innerText = '題型二：電子轉移莫耳數（僅選數字）';
-        questionHTML = `1 莫耳的 <span class="text-indigo-600">${target.name}</span> 在「${target.condition}」下完全反應，共轉移多少莫耳電子？`;
-        currentQuizSummaryPrompt = `1 mol ${target.name}（${target.condition}）轉移幾 mol e⁻？`;
-        correctAnswer = target.electronNum;
-        const pureNumberPool = ['1', '2', '3', '4', '5', '6', '8'].filter(n => n !== correctAnswer);
-        options = shuffle([correctAnswer, ...shuffle(pureNumberPool).slice(0, 3)]);
+      // 取得題目（錯題模式從錯題佇列取；一般模式從全域不重複洗牌池取）
+      let itemObj = null;
+      if (quizModeType === 'mistake') {
+        itemObj = mistakePracticeQueue[quizAnsweredCount];
       } else {
-        document.getElementById('quiz-type-label').innerText = '題型三：畫底線原子氧化數變化';
-        questionHTML = `<span class="text-indigo-600">${target.underlinedName}</span> 在「${target.condition}」下反應時，其核心（畫底線）原子的氧化數變化為何？`;
-        currentQuizSummaryPrompt = `${target.underlinedName}（${target.condition}）氧化數變化？`;
-        correctAnswer = target.oxChange;
-        const pool = [...new Set(speciesData.map(d => d.oxChange))].filter(o => o !== correctAnswer);
-        options = shuffle([correctAnswer, ...shuffle(pool).slice(0, 3)]);
+        itemObj = drawUniqueQuizItem(sessionUsedUids);
+        sessionUsedUids.add(itemObj.uid);
+      }
+      currentQuizItem = itemObj;
+
+      // 動態產生 4 個不重複選項並洗牌
+      let options = [];
+      if (itemObj.qType === 0) {
+        const pool = [...new Set(speciesData.map(d => d.product))].filter(p => p !== itemObj.correctAnswer);
+        options = shuffle([itemObj.correctAnswer, ...shuffle(pool).slice(0, 3)]);
+      } else if (itemObj.qType === 1) {
+        const pureNumberPool = ['1', '2', '3', '4', '5', '6', '8'].filter(n => n !== itemObj.correctAnswer);
+        options = shuffle([itemObj.correctAnswer, ...shuffle(pureNumberPool).slice(0, 3)]);
+      } else {
+        const pool = [...new Set(speciesData.map(d => d.oxChange))].filter(o => o !== itemObj.correctAnswer);
+        options = shuffle([itemObj.correctAnswer, ...shuffle(pool).slice(0, 3)]);
       }
 
       currentQuizOptions = options;
-      currentQuizCorrectIndex = options.indexOf(correctAnswer);
+      currentQuizCorrectIndex = options.indexOf(itemObj.correctAnswer);
+      const sp = itemObj.species;
       currentQuizExplain = `
-        <strong>標準半反應式：</strong><span class="chem-formula">${target.halfRxn}</span><br>
-        <strong>變化解析：</strong>畫底線原子氧化數 <strong>${target.oxChange}</strong>，1 莫耳反應物轉移 <strong>${target.electrons}</strong> 莫耳電子。<br>
-        <span class="text-slate-600">💡 ${target.note}</span>
+        <strong>標準半反應式：</strong><span class="chem-formula">${sp.halfRxn}</span><br>
+        <strong>解析：</strong>氧化數 <strong>${sp.oxChange}</strong>，1 mol 轉移 <strong>${sp.electrons}</strong> mol e⁻。
       `;
-      document.getElementById('quiz-question').innerHTML = questionHTML;
+
+      document.getElementById('quiz-type-label').innerText = itemObj.typeLabel;
+      document.getElementById('quiz-question').innerHTML = itemObj.questionHTML;
 
       const optContainer = document.getElementById('quiz-options');
       optContainer.innerHTML = options.map((opt, idx) => `
-        <button onclick="checkQuizAnswer(${idx})" id="quiz-opt-${idx}" class="quiz-opt-btn p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 text-left font-bold text-slate-700 transition chem-formula">
+        <button onclick="checkQuizAnswer(${idx})" id="quiz-opt-${idx}" class="quiz-opt-btn p-3.5 sm:p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/50 text-left font-bold text-sm sm:text-base text-slate-700 transition chem-formula">
           ${opt}
         </button>
       `).join('');
@@ -899,20 +1364,28 @@
 
       if (isCorrect) {
         quizScore++;
+        // 若這題原本在錯題本裡，答對即消滅移除！
+        const wasMistake = savedMistakesMap.has(currentQuizItem.uid);
+        removeMistake(currentQuizItem.uid);
+
+        triggerCenterPraise(wasMistake ? '錯題消滅！🎉' : null);
         selectedBtn.classList.replace('border-slate-200', 'border-emerald-500');
         selectedBtn.classList.add('bg-emerald-50', 'text-emerald-800');
         feedback.classList.add('bg-emerald-50', 'text-emerald-900', 'border', 'border-emerald-200');
-        feedback.innerHTML = `✅ <strong>答對了！</strong><br>${currentQuizExplain}`;
+        feedback.innerHTML = `✅ ${wasMistake ? '<strong class="text-emerald-700">[已從錯題本移除]</strong> ' : ''}${currentQuizExplain}`;
       } else {
+        // 答錯自動收錄至錯題本
+        recordMistake(currentQuizItem, currentQuizOptions[selectedIdx]);
+
         selectedBtn.classList.replace('border-slate-200', 'border-rose-500');
         selectedBtn.classList.add('bg-rose-50', 'text-rose-800');
         correctBtn.classList.replace('border-slate-200', 'border-emerald-500');
         correctBtn.classList.add('bg-emerald-50', 'text-emerald-800');
         feedback.classList.add('bg-rose-50', 'text-rose-900', 'border', 'border-rose-200');
-        feedback.innerHTML = `❌ <strong>再想一下喔！</strong> 正確答案是：<strong class="chem-formula">${currentQuizOptions[currentQuizCorrectIndex]}</strong><br>${currentQuizExplain}`;
+        feedback.innerHTML = `❌ <strong>正解：<span class="chem-formula">${currentQuizOptions[currentQuizCorrectIndex]}</span></strong>（已收錄至錯題練習區）<br>${currentQuizExplain}`;
 
-        quizMistakes.push({
-          prompt: currentQuizSummaryPrompt,
+        sessionMistakes.push({
+          prompt: currentQuizItem.summaryPrompt,
           userAns: currentQuizOptions[selectedIdx],
           correctAns: currentQuizOptions[currentQuizCorrectIndex],
           explain: currentQuizExplain
@@ -920,7 +1393,7 @@
       }
 
       document.getElementById('quiz-score').innerText = quizScore;
-      if (quizModeType === 'count') {
+      if (quizModeType === 'count' || quizModeType === 'mistake') {
         const pct = Math.min(100, Math.round((quizAnsweredCount / quizTargetCount) * 100));
         document.getElementById('quiz-progress-bar').style.width = `${pct}%`;
       }
@@ -928,45 +1401,80 @@
     }
 
     function nextQuiz() {
-      if (quizModeType === 'count' && quizAnsweredCount >= quizTargetCount) {
-        finishQuizSession('已完成指定題數！');
+      if ((quizModeType === 'count' || quizModeType === 'mistake') && quizAnsweredCount >= quizTargetCount) {
+        finishQuizSession();
       } else {
         generateQuiz();
       }
     }
 
-    function finishQuizSession(reasonTitle) {
+    function finishQuizSession() {
       stopQuizTimer();
-      document.getElementById('quiz-active-box').classList.add('hidden');
+      hideAllQuizBoxes();
       document.getElementById('quiz-summary-box').classList.remove('hidden');
 
       const elapsedSec = Math.max(1, Math.round((Date.now() - quizStartTime) / 1000));
       const accuracy = quizAnsweredCount === 0 ? 0 : Math.round((quizScore / quizAnsweredCount) * 100);
 
-      document.getElementById('summary-title').innerText = reasonTitle;
-      document.getElementById('summary-subtitle').innerText = quizModeType === 'count'
-        ? `指定 ${quizTargetCount} 題挑戰結算`
-        : `限時 ${quizTimeLimit / 60} 分鐘衝刺結算`;
+      if (quizModeType === 'mistake') {
+        document.getElementById('summary-subtitle').innerText = '錯題特訓結算';
+      } else {
+        document.getElementById('summary-subtitle').innerText = quizModeType === 'count'
+          ? `指定 ${quizTargetCount} 題挑戰`
+          : `限時 ${quizTimeLimit / 60} 分鐘衝刺`;
+      }
 
-      document.getElementById('summary-emoji').innerText = accuracy >= 80 ? '🏆' : (accuracy >= 60 ? '👏' : '💪');
       document.getElementById('sum-correct').innerText = quizScore;
       document.getElementById('sum-total').innerText = quizAnsweredCount;
       document.getElementById('sum-accuracy').innerText = `${accuracy}%`;
       document.getElementById('sum-time').innerText = `${elapsedSec} 秒`;
 
+      let mainEncourage = '';
+      let chosenIllustration = cuteIllustrations.happyBeaker;
+      let praiseTheme = 'gold';
+
+      if (quizAnsweredCount === 0 || accuracy < 60) {
+        mainEncourage = '現在放棄就輸了！🔥';
+        chosenIllustration = cuteIllustrations.sproutTube;
+        praiseTheme = 'encourage';
+      } else if (accuracy === 100) {
+        mainEncourage = quizModeType === 'mistake' ? '錯題全數消滅！✨' : '氧化還原大師就是你！✨';
+        chosenIllustration = cuteIllustrations.trophyFlask;
+      } else if (accuracy >= 80) {
+        mainEncourage = '實力不錯唷！💪';
+        chosenIllustration = cuteIllustrations.happyBeaker;
+      } else {
+        mainEncourage = '漸入佳境！🌟';
+        chosenIllustration = cuteIllustrations.happyBeaker;
+      }
+
+      document.getElementById('summary-illustration').innerHTML = chosenIllustration;
+      document.getElementById('summary-encourage-main').innerText = mainEncourage;
+
+      // 結算時於畫面正中央閃現情緒鼓勵短句
+      triggerCenterPraise(mainEncourage, praiseTheme);
+
       const mistakeSec = document.getElementById('summary-mistakes-section');
       const mistakeList = document.getElementById('summary-mistakes-list');
+      const retryMistakeBtn = document.getElementById('summary-retry-mistakes-btn');
 
-      if (quizMistakes.length === 0) {
+      if (savedMistakesMap.size > 0) {
+        retryMistakeBtn.classList.remove('hidden');
+        retryMistakeBtn.innerText = `📕 練習錯題 (${savedMistakesMap.size})`;
+      } else {
+        retryMistakeBtn.classList.add('hidden');
+      }
+
+      if (sessionMistakes.length === 0) {
         mistakeSec.classList.add('hidden');
       } else {
         mistakeSec.classList.remove('hidden');
-        mistakeList.innerHTML = quizMistakes.map((m, idx) => `
+        mistakeList.innerHTML = sessionMistakes.map((m, idx) => `
           <div class="p-3.5 rounded-xl bg-rose-50/70 border border-rose-200 text-xs space-y-1">
             <div class="font-bold text-slate-800 chem-formula">${idx + 1}. ${m.prompt}</div>
             <div class="flex flex-wrap gap-3">
-              <span class="text-rose-700">你的選擇：<strong class="chem-formula">${m.userAns}</strong></span>
-              <span class="text-emerald-700">正確答案：<strong class="chem-formula">${m.correctAns}</strong></span>
+              <span class="text-rose-700">你選：<strong class="chem-formula">${m.userAns}</strong></span>
+              <span class="text-emerald-700">正解：<strong class="chem-formula">${m.correctAns}</strong></span>
             </div>
             <div class="text-slate-600 pt-1 border-t border-rose-100 leading-relaxed">${m.explain}</div>
           </div>
@@ -974,11 +1482,7 @@
       }
     }
 
-    function shuffle(arr) {
-      return [...arr].sort(() => Math.random() - 0.5);
-    }
-
-    // ==================== 資料庫 2：半反應式引導（① 判別畫底線原子氧化數變化量 -> ② 判斷電子得失 -> ③ 電量守恆 -> ④ 原子不滅） ====================
+    // ==================== 資料庫 2：半反應式平衡法引導 ====================
     const halfRxnProblems = [
       {
         env: '酸性環境（使用 H⁺ 平衡電荷）',
@@ -987,48 +1491,49 @@
         steps: [
           {
             name: '步驟 1：判別畫底線的原子氧化數變化量',
-            desc: '請分別填入反應前 <u>Mn</u>O<sub>4</sub><sup>-</sup> 與反應後 <u>Mn</u><sup>2+</sup> 中，畫底線原子（Mn）的氧化數：',
+            desc: '填入反應前 <u>Mn</u>O<sub>4</sub><sup>-</sup> 與反應後 <u>Mn</u><sup>2+</sup> 中，畫底線原子（Mn）的氧化數：',
             equation: `
               <div class="space-y-4">
-                <div class="text-2xl font-black text-slate-800"><u>Mn</u>O<sub>4</sub><sup>-</sup> → <u>Mn</u><sup>2+</sup></div>
-                <div class="flex flex-wrap items-center justify-center gap-3 text-base">
+                <div class="text-xl sm:text-2xl font-black text-slate-800"><u>Mn</u>O<sub>4</sub><sup>-</sup> → <u>Mn</u><sup>2+</sup></div>
+                <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base">
                   <span>畫底線 <u>Mn</u> 氧化數：</span>
-                  <input id="s-in-1" type="number" class="w-16 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold text-indigo-700" placeholder="?">
+                  <input id="s-in-1" type="number" class="w-14 sm:w-16 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold text-emerald-800" placeholder="?">
                   <span class="font-black text-slate-400">→</span>
-                  <input id="s-in-2" type="number" class="w-16 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold text-indigo-700" placeholder="?">
+                  <input id="s-in-2" type="number" class="w-14 sm:w-16 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold text-emerald-800" placeholder="?">
                 </div>
               </div>
             `,
             validate: () => parseFloat(document.getElementById('s-in-1').value) === 7 && parseFloat(document.getElementById('s-in-2').value) === 2,
-            tip: 'MnO₄⁻ 中，O 為 -2 價，Mn + 4×(-2) = -1 ⇒ Mn 為 +7；產物 Mn²⁺ 單原子離子氧化數為 +2（氧化數變化量為 +7 → +2）。'
+            tip: 'MnO₄⁻ 中 Mn + 4×(-2) = -1 ⇒ +7；Mn²⁺ 為 +2。'
           },
           {
             name: '步驟 2：平衡核心原子數並判斷「電子得失」',
-            desc: '左右兩邊各有 1 個 <u>Mn</u> 原子（係數 1 : 1），每個 <u>Mn</u> 氧化數由 <strong>+7 降至 +2</strong>（下降 5，代表<strong>獲得電子</strong>）。請問<strong>左邊</strong>應加入幾個 e⁻？',
-            equation: '1 <u>Mn</u>O<sub>4</sub><sup>-</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> e<sup>-</sup> → 1 <u>Mn</u><sup>2+</sup>',
+            desc: '左右各有 1 個 <u>Mn</u>，氧化數由 <strong>+7 降至 +2</strong>，請問<strong>左邊</strong>應加入幾個 e⁻？',
+            equation: '1 <u>Mn</u>O<sub>4</sub><sup>-</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> e<sup>-</sup> → 1 <u>Mn</u><sup>2+</sup>',
             validate: () => document.getElementById('s-in-1').value == 5,
-            tip: '1 個 Mn 原子從 +7 降至 +2，共獲得 5 個電子（5e⁻）。'
+            tip: '+7 降至 +2，共獲得 5 個電子（5e⁻）。'
           },
           {
             name: '步驟 3：加入 H⁺ 達成「電量守恆」',
-            desc: '目前左邊總電荷為 (-1) + (-5) = <strong>-6</strong>；右邊總電荷為 <strong>+2</strong>。在<strong>酸性環境</strong>下，請問<strong>左邊</strong>需加入幾個帶正電的 H⁺，才能使左右總電荷相等（都變成 +2）？',
-            equation: '<u>Mn</u>O<sub>4</sub><sup>-</sup> + 5e<sup>-</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> H<sup>+</sup> → <u>Mn</u><sup>2+</sup>',
+            desc: '左邊總電荷 (-1) + (-5) = <strong>-6</strong>；右邊為 <strong>+2</strong>。<strong>左邊</strong>需加入幾個 H⁺ 使兩邊皆為 +2？',
+            equation: '<u>Mn</u>O<sub>4</sub><sup>-</sup> + 5e<sup>-</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> H<sup>+</sup> → <u>Mn</u><sup>2+</sup>',
             validate: () => document.getElementById('s-in-1').value == 8,
-            tip: '設左邊加 x 個 H⁺：(-6) + (+x) = +2 ⇒ x = 8！加上 8H⁺ 後左右電荷皆為 +2。'
+            tip: '(-6) + (+8) = +2，需加 8 個 H⁺。'
           },
           {
             name: '步驟 4：補上 H₂O 維持「原子不滅」',
-            desc: '現在檢查氫、氧原子數：左邊有 8 個 H 與 4 個 O，請問<strong>右邊</strong>應補上幾個 H₂O 分子來維持原子不滅？',
-            equation: '<u>Mn</u>O<sub>4</sub><sup>-</sup> + 8H<sup>+</sup> + 5e<sup>-</sup> → <u>Mn</u><sup>2+</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> H<sub>2</sub>O',
+            desc: '左邊有 8 個 H 與 4 個 O，<strong>右邊</strong>應補上幾個 H₂O？',
+            equation: '<u>Mn</u>O<sub>4</sub><sup>-</sup> + 8H<sup>+</sup> + 5e<sup>-</sup> → <u>Mn</u><sup>2+</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> H<sub>2</sub>O',
             validate: () => document.getElementById('s-in-1').value == 4,
-            tip: '4 個 H₂O 剛好提供 8 個 H 原子與 4 個 O 原子，與左邊完全相等！'
+            tip: '4 個 H₂O 剛好提供 8 個 H 與 4 個 O。'
           },
           {
             name: '步驟 5：完成檢核！',
-            desc: '完成標準半反應式！最後用 O 原子數（左 4 個 = 右 4 個）做雙重驗算：',
-            equation: '<div class="text-emerald-700 font-black text-lg"><u>Mn</u>O<sub>4</sub><sup>-</sup> + 8H<sup>+</sup> + 5e<sup>-</sup> → <u>Mn</u><sup>2+</sup>（淡粉紅）+ 4H<sub>2</sub>O</div>',
+            desc: '核對最終標準半反應式：',
+            isComplete: true,
+            equation: '<div class="text-emerald-700 font-black text-base sm:text-lg"><u>Mn</u>O<sub>4</sub><sup>-</sup> + 8H<sup>+</sup> + 5e<sup>-</sup> → <u>Mn</u><sup>2+</sup>（淡粉紅）+ 4H<sub>2</sub>O</div>',
             validate: () => true,
-            tip: '氧化數變化量 (+7 → +2) → 電子得失 (5e⁻) → 電量守恆 (8H⁺) → 原子不滅 (4H₂O)。'
+            tip: 'O 原子左右皆為 4 個，雙重驗算過關！'
           }
         ]
       },
@@ -1039,48 +1544,49 @@
         steps: [
           {
             name: '步驟 1：判別畫底線的原子氧化數變化量',
-            desc: '請分別填入反應前 <u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> 與反應後 <u>Cr</u><sup>3+</sup> 中，畫底線原子（Cr）的氧化數：',
+            desc: '填入反應前 <u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> 與反應後 <u>Cr</u><sup>3+</sup> 中，畫底線原子（Cr）的氧化數：',
             equation: `
               <div class="space-y-4">
-                <div class="text-2xl font-black text-slate-800"><u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> → <u>Cr</u><sup>3+</sup></div>
-                <div class="flex flex-wrap items-center justify-center gap-3 text-base">
+                <div class="text-xl sm:text-2xl font-black text-slate-800"><u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> → <u>Cr</u><sup>3+</sup></div>
+                <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base">
                   <span>畫底線 <u>Cr</u> 氧化數：</span>
-                  <input id="s-in-1" type="number" class="w-16 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold text-indigo-700" placeholder="?">
+                  <input id="s-in-1" type="number" class="w-14 sm:w-16 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold text-emerald-800" placeholder="?">
                   <span class="font-black text-slate-400">→</span>
-                  <input id="s-in-2" type="number" class="w-16 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold text-indigo-700" placeholder="?">
+                  <input id="s-in-2" type="number" class="w-14 sm:w-16 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold text-emerald-800" placeholder="?">
                 </div>
               </div>
             `,
             validate: () => parseFloat(document.getElementById('s-in-1').value) === 6 && parseFloat(document.getElementById('s-in-2').value) === 3,
-            tip: 'Cr₂O₇²⁻ 中，2×Cr + 7×(-2) = -2 ⇒ 每個 Cr 為 +6；產物 Cr³⁺ 為 +3（氧化數變化量為 +6 → +3）。'
+            tip: 'Cr₂O₇²⁻ 中 2Cr + 7(-2) = -2 ⇒ +6；Cr³⁺ 為 +3。'
           },
           {
             name: '步驟 2：平衡核心原子數並判斷「電子得失」',
-            desc: '1 個 <u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> 含有 <strong>2 個 <u>Cr</u> 原子</strong>（右邊係數為 2），每個 <u>Cr</u> 由 <strong>+6 降至 +3</strong>（每個得 3e⁻），請問<strong>左邊</strong>總共需加入幾個 e⁻？',
-            equation: '1 <u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> e<sup>-</sup> → 2 <u>Cr</u><sup>3+</sup>',
+            desc: '共有 <strong>2 個 <u>Cr</u> 原子</strong>，每個由 <strong>+6 降至 +3</strong>，<strong>左邊</strong>總共需加入幾個 e⁻？',
+            equation: '1 <u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> e<sup>-</sup> → 2 <u>Cr</u><sup>3+</sup>',
             validate: () => document.getElementById('s-in-1').value == 6,
-            tip: '每個 Cr 得 3 個電子，2 個 Cr 原子共獲得 3 × 2 = 6 個電子（6e⁻）。'
+            tip: '3 × 2 = 6 個電子（6e⁻）。'
           },
           {
             name: '步驟 3：加入 H⁺ 達成「電量守恆」',
-            desc: '目前左邊總電荷為 (-2) + (-6) = <strong>-8</strong>；右邊總電荷為 2 × (+3) = <strong>+6</strong>。在<strong>酸性環境</strong>下，請問<strong>左邊</strong>需加入幾個 H⁺ 才能使左右總電荷都等於 +6？',
-            equation: '<u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> + 6e<sup>-</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> H<sup>+</sup> → 2 <u>Cr</u><sup>3+</sup>',
+            desc: '左邊總電荷 (-2) + (-6) = <strong>-8</strong>；右邊為 <strong>+6</strong>。<strong>左邊</strong>需加入幾個 H⁺ 使兩邊皆為 +6？',
+            equation: '<u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> + 6e<sup>-</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> H<sup>+</sup> → 2 <u>Cr</u><sup>3+</sup>',
             validate: () => document.getElementById('s-in-1').value == 14,
-            tip: '(-8) + (+14) = +6，剛好與右邊 +6 達成電量守恆！'
+            tip: '(-8) + (+14) = +6，需加 14 個 H⁺。'
           },
           {
             name: '步驟 4：補上 H₂O 維持「原子不滅」',
-            desc: '左邊有 14 個 H 原子與 7 個 O 原子，請問<strong>右邊</strong>需補上幾個 H₂O 分子？',
-            equation: '<u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> + 14H<sup>+</sup> + 6e<sup>-</sup> → 2 <u>Cr</u><sup>3+</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> H<sub>2</sub>O',
+            desc: '左邊有 14 個 H 與 7 個 O，<strong>右邊</strong>需補上幾個 H₂O？',
+            equation: '<u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> + 14H<sup>+</sup> + 6e<sup>-</sup> → 2 <u>Cr</u><sup>3+</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> H<sub>2</sub>O',
             validate: () => document.getElementById('s-in-1').value == 7,
-            tip: '7 個 H₂O 提供 14 個 H 與 7 個 O，原子完全不滅！'
+            tip: '7 個 H₂O 提供 14 個 H 與 7 個 O。'
           },
           {
             name: '步驟 5：完成檢核！',
-            desc: '二鉻酸根（橙色）在酸性下還原為鉻離子（綠色）的完整半反應式：',
-            equation: '<div class="text-emerald-700 font-black text-lg"><u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> + 14H<sup>+</sup> + 6e<sup>-</sup> → 2 <u>Cr</u><sup>3+</sup>（綠）+ 7H<sub>2</sub>O</div>',
+            desc: '核對最終標準半反應式：',
+            isComplete: true,
+            equation: '<div class="text-emerald-700 font-black text-base sm:text-lg"><u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> + 14H<sup>+</sup> + 6e<sup>-</sup> → 2 <u>Cr</u><sup>3+</sup>（綠）+ 7H<sub>2</sub>O</div>',
             validate: () => true,
-            tip: '1 鉻 14 氫 6 電子，配合電量守恆法完全不用死背係數！'
+            tip: '1 鉻 14 氫 6 電子，輕鬆推導免死背！'
           }
         ]
       },
@@ -1091,48 +1597,49 @@
         steps: [
           {
             name: '步驟 1：判別畫底線的原子氧化數變化量',
-            desc: '請分別填入反應前 <u>Mn</u>O<sub>4</sub><sup>-</sup> 與反應後 <u>Mn</u>O<sub>2</sub> 中，畫底線原子（Mn）的氧化數：',
+            desc: '填入反應前 <u>Mn</u>O<sub>4</sub><sup>-</sup> 與反應後 <u>Mn</u>O<sub>2</sub> 中，畫底線原子（Mn）的氧化數：',
             equation: `
               <div class="space-y-4">
-                <div class="text-2xl font-black text-slate-800"><u>Mn</u>O<sub>4</sub><sup>-</sup> → <u>Mn</u>O<sub>2</sub></div>
-                <div class="flex flex-wrap items-center justify-center gap-3 text-base">
+                <div class="text-xl sm:text-2xl font-black text-slate-800"><u>Mn</u>O<sub>4</sub><sup>-</sup> → <u>Mn</u>O<sub>2</sub></div>
+                <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base">
                   <span>畫底線 <u>Mn</u> 氧化數：</span>
-                  <input id="s-in-1" type="number" class="w-16 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold text-indigo-700" placeholder="?">
+                  <input id="s-in-1" type="number" class="w-14 sm:w-16 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold text-emerald-800" placeholder="?">
                   <span class="font-black text-slate-400">→</span>
-                  <input id="s-in-2" type="number" class="w-16 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold text-indigo-700" placeholder="?">
+                  <input id="s-in-2" type="number" class="w-14 sm:w-16 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold text-emerald-800" placeholder="?">
                 </div>
               </div>
             `,
             validate: () => parseFloat(document.getElementById('s-in-1').value) === 7 && parseFloat(document.getElementById('s-in-2').value) === 4,
-            tip: 'MnO₄⁻ 中 Mn 為 +7；MnO₂ 中 Mn + 2×(-2) = 0 ⇒ Mn 為 +4（氧化數變化量為 +7 → +4）。'
+            tip: 'MnO₄⁻ 中 Mn 為 +7；MnO₂ 中 Mn 為 +4。'
           },
           {
             name: '步驟 2：平衡核心原子數並判斷「電子得失」',
-            desc: '左右各有 1 個 <u>Mn</u> 原子（係數 1 : 1），氧化數由 <strong>+7 降至 +4</strong>（下降 3）。請問<strong>左邊</strong>需獲得幾個 e⁻？',
-            equation: '1 <u>Mn</u>O<sub>4</sub><sup>-</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> e<sup>-</sup> → 1 <u>Mn</u>O<sub>2</sub>',
+            desc: '氧化數由 <strong>+7 降至 +4</strong>，<strong>左邊</strong>需獲得幾個 e⁻？',
+            equation: '1 <u>Mn</u>O<sub>4</sub><sup>-</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> e<sup>-</sup> → 1 <u>Mn</u>O<sub>2</sub>',
             validate: () => document.getElementById('s-in-1').value == 3,
             tip: '+7 降至 +4，獲得 3 個電子（3e⁻）。'
           },
           {
             name: '步驟 3：加入 OH⁻ 達成「電量守恆」',
-            desc: '目前左邊總電荷為 (-1) + (-3) = <strong>-4</strong>；右邊 <u>Mn</u>O<sub>2</sub> 為電中性（<strong>0</strong>）。因為是<strong>中性／微鹼性環境</strong>，使用帶負電的 <strong>OH⁻</strong> 來平衡電荷！請問<strong>右邊</strong>應加入幾個 OH⁻ 使兩邊電荷皆為 -4？',
-            equation: '<u>Mn</u>O<sub>4</sub><sup>-</sup> + 3e<sup>-</sup> → <u>Mn</u>O<sub>2</sub> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> OH<sup>-</sup>',
+            desc: '左邊總電荷為 <strong>-4</strong>；右邊為 <strong>0</strong>。<strong>右邊</strong>應加入幾個 OH⁻ 使兩邊皆為 -4？',
+            equation: '<u>Mn</u>O<sub>4</sub><sup>-</sup> + 3e<sup>-</sup> → <u>Mn</u>O<sub>2</sub> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> OH<sup>-</sup>',
             validate: () => document.getElementById('s-in-1').value == 4,
-            tip: '右邊加上 4 個 OH⁻ 後，總電荷變成 0 + (-4) = -4，直接與左邊 -4 達成電量守恆！'
+            tip: '右邊加 4 個 OH⁻，直接達成電量守恆！'
           },
           {
             name: '步驟 4：補上 H₂O 維持「原子不滅」',
-            desc: '右邊現在共有 4 個 H 原子（來自 4OH⁻）與 6 個 O 原子（2 + 4 = 6）；左邊目前只有 4 個 O 原子、沒有 H 原子。請問<strong>左邊</strong>應補上幾個 H₂O 分子？',
-            equation: '<u>Mn</u>O<sub>4</sub><sup>-</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> H<sub>2</sub>O + 3e<sup>-</sup> → <u>Mn</u>O<sub>2</sub> + 4OH<sup>-</sup>',
+            desc: '右邊有 4 個 H 與 6 個 O；左邊目前只有 4 個 O。<strong>左邊</strong>應補上幾個 H₂O？',
+            equation: '<u>Mn</u>O<sub>4</sub><sup>-</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> H<sub>2</sub>O + 3e<sup>-</sup> → <u>Mn</u>O<sub>2</sub> + 4OH<sup>-</sup>',
             validate: () => document.getElementById('s-in-1').value == 2,
-            tip: '左邊補 2 個 H₂O，提供 4 個 H 與 2 個 O（4 + 2 = 6 個 O），左右原子完全不滅！'
+            tip: '左邊補 2 個 H₂O，原子完全不滅！'
           },
           {
             name: '步驟 5：完成檢核！',
-            desc: '透過直接加 OH⁻ 做電量守恆，完全不必先用 H⁺ 再移項約分！',
-            equation: '<div class="text-emerald-700 font-black text-lg"><u>Mn</u>O<sub>4</sub><sup>-</sup> + 2H<sub>2</sub>O + 3e<sup>-</sup> → <u>Mn</u>O<sub>2</sub>（褐）+ 4OH<sup>-</sup></div>',
+            desc: '核對最終標準半反應式：',
+            isComplete: true,
+            equation: '<div class="text-emerald-700 font-black text-base sm:text-lg"><u>Mn</u>O<sub>4</sub><sup>-</sup> + 2H<sub>2</sub>O + 3e<sup>-</sup> → <u>Mn</u>O<sub>2</sub>（褐）+ 4OH<sup>-</sup></div>',
             validate: () => true,
-            tip: '左右皆為 1 Mn、6 O、4 H，且總電荷皆為 -4。'
+            tip: '左右皆為 1 Mn、6 O、4 H，總電荷皆為 -4。'
           }
         ]
       },
@@ -1143,48 +1650,49 @@
         steps: [
           {
             name: '步驟 1：判別畫底線的原子氧化數變化量',
-            desc: '請分別填入反應前 <u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> 與反應後 <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup> 中，畫底線原子（S）的平均氧化數（可輸入小數 2.5）：',
+            desc: '填入反應前 <u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> 與反應後 <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup> 中，畫底線原子（S）的平均氧化數：',
             equation: `
               <div class="space-y-4">
-                <div class="text-2xl font-black text-slate-800"><u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup></div>
-                <div class="flex flex-wrap items-center justify-center gap-3 text-base">
+                <div class="text-xl sm:text-2xl font-black text-slate-800"><u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup></div>
+                <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base">
                   <span>畫底線 <u>S</u> 氧化數：</span>
-                  <input id="s-in-1" type="number" step="0.5" class="w-16 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold text-indigo-700" placeholder="?">
+                  <input id="s-in-1" type="number" step="0.5" class="w-14 sm:w-16 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold text-emerald-800" placeholder="?">
                   <span class="font-black text-slate-400">→</span>
-                  <input id="s-in-2" type="number" step="0.5" class="w-16 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold text-indigo-700" placeholder="?">
+                  <input id="s-in-2" type="number" step="0.5" class="w-14 sm:w-16 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold text-emerald-800" placeholder="?">
                 </div>
               </div>
             `,
             validate: () => parseFloat(document.getElementById('s-in-1').value) === 2 && parseFloat(document.getElementById('s-in-2').value) === 2.5,
-            tip: 'S₂O₃²⁻ 中 2S + 3(-2) = -2 ⇒ S = +2；S₄O₆²⁻ 中 4S + 6(-2) = -2 ⇒ S = +2.5（氧化數變化量為 +2 → +2.5）。'
+            tip: 'S₂O₃²⁻ 中 S 為 +2；S₄O₆²⁻ 中 S 為 +2.5。'
           },
           {
             name: '步驟 2：平衡核心原子數並判斷「電子得失」',
-            desc: '以 1 mol <u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> 為基準（含 <strong>2 個 <u>S</u> 原子</strong>，右邊 <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup> 係數為 1/2），每個 <u>S</u> 由 <strong>+2 升至 +2.5</strong>（每個失 0.5e⁻），請問<strong>右邊</strong>共釋出幾個 e⁻？',
-            equation: '1 <u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → 1/2 <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> e<sup>-</sup>',
+            desc: '2 個 <u>S</u> 由 <strong>+2 升至 +2.5</strong>，<strong>右邊</strong>共釋出幾個 e⁻？',
+            equation: '1 <u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → 1/2 <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> e<sup>-</sup>',
             validate: () => document.getElementById('s-in-1').value == 1,
             tip: '0.5 × 2 = 1 個電子（e⁻）。'
           },
           {
             name: '步驟 3：檢查「電量守恆」',
-            desc: '計算目前總電荷：左邊為 <strong>-2</strong>；右邊為 0.5×(-2) + (-1) = <strong>-2</strong>！請問還需要額外加入 H⁺ 或 OH⁻ 嗎？（輸入 0 代表電荷已守恆）',
-            equation: '<u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> H<sup>+</sup> → 1/2 <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup> + e<sup>-</sup>',
+            desc: '左右總電荷皆為 <strong>-2</strong>！還需要加 H⁺ 嗎？（輸入 0 代表已守恆）',
+            equation: '<u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> H<sup>+</sup> → 1/2 <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup> + e<sup>-</sup>',
             validate: () => document.getElementById('s-in-1').value == 0,
-            tip: '左右兩邊電荷已經都是 -2，電量已完全守恆！'
+            tip: '電量已完全守恆！'
           },
           {
             name: '步驟 4：檢查「原子不滅」',
-            desc: '左邊有 3 個 O，右邊 0.5 × 6 = 3 個 O，需要補 H₂O 嗎？（輸入 0 代表原子已不滅）',
-            equation: '<u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → 1/2 <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup> + e<sup>-</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> H<sub>2</sub>O',
+            desc: '左右皆有 3 個 O，需要補 H₂O 嗎？（輸入 0 代表已不滅）',
+            equation: '<u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → 1/2 <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup> + e<sup>-</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> H<sub>2</sub>O',
             validate: () => document.getElementById('s-in-1').value == 0,
-            tip: '氧原子與硫原子皆已完全守恆，不需補水！'
+            tip: '原子已完全不滅！'
           },
           {
             name: '步驟 5：完成檢核！',
-            desc: '硫代硫酸根與弱氧化劑（如 I₂）反應的標準半反應式：',
-            equation: '<div class="text-emerald-700 font-black text-lg"><u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → 1/2 <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup> + e<sup>-</sup></div>',
+            desc: '核對最終標準半反應式：',
+            isComplete: true,
+            equation: '<div class="text-emerald-700 font-black text-base sm:text-lg"><u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → 1/2 <u>S</u><sub>4</sub>O<sub>6</sub><sup>2-</sup> + e<sup>-</sup></div>',
             validate: () => true,
-            tip: '1 mol S₂O₃²⁻ 遇弱氧化劑僅轉移 1 mol e⁻。'
+            tip: '1 mol S₂O₃²⁻ 遇弱氧化劑轉移 1 mol e⁻。'
           }
         ]
       },
@@ -1195,60 +1703,79 @@
         steps: [
           {
             name: '步驟 1：判別畫底線的原子氧化數變化量',
-            desc: '請分別填入反應前 <u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> 與反應後 <u>S</u>O<sub>4</sub><sup>2-</sup> 中，畫底線原子（S）的氧化數：',
+            desc: '填入反應前 <u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> 與反應後 <u>S</u>O<sub>4</sub><sup>2-</sup> 中，畫底線原子（S）的氧化數：',
             equation: `
               <div class="space-y-4">
-                <div class="text-2xl font-black text-slate-800"><u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → <u>S</u>O<sub>4</sub><sup>2-</sup></div>
-                <div class="flex flex-wrap items-center justify-center gap-3 text-base">
+                <div class="text-xl sm:text-2xl font-black text-slate-800"><u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → <u>S</u>O<sub>4</sub><sup>2-</sup></div>
+                <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-sm sm:text-base">
                   <span>畫底線 <u>S</u> 氧化數：</span>
-                  <input id="s-in-1" type="number" class="w-16 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold text-indigo-700" placeholder="?">
+                  <input id="s-in-1" type="number" class="w-14 sm:w-16 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold text-emerald-800" placeholder="?">
                   <span class="font-black text-slate-400">→</span>
-                  <input id="s-in-2" type="number" class="w-16 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold text-indigo-700" placeholder="?">
+                  <input id="s-in-2" type="number" class="w-14 sm:w-16 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold text-emerald-800" placeholder="?">
                 </div>
               </div>
             `,
             validate: () => parseFloat(document.getElementById('s-in-1').value) === 2 && parseFloat(document.getElementById('s-in-2').value) === 6,
-            tip: 'S₂O₃²⁻ 中 S 為 +2；SO₄²⁻ 中 S + 4(-2) = -2 ⇒ S 為 +6（氧化數變化量為 +2 → +6）。'
+            tip: 'S₂O₃²⁻ 中 S 為 +2；SO₄²⁻ 中 S 為 +6。'
           },
           {
             name: '步驟 2：平衡核心原子數並判斷「電子得失」',
-            desc: '1 個 <u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> 含有 <strong>2 個 <u>S</u> 原子</strong>（右邊生成 2 個 <u>S</u>O<sub>4</sub><sup>2-</sup>），每個 <u>S</u> 由 <strong>+2 升至 +6</strong>（每個失 4e⁻），請問<strong>右邊</strong>總共釋出幾個 e⁻？',
-            equation: '1 <u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → 2 <u>S</u>O<sub>4</sub><sup>2-</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> e<sup>-</sup>',
+            desc: '2 個 <u>S</u> 由 <strong>+2 升至 +6</strong>，<strong>右邊</strong>總共釋出幾個 e⁻？',
+            equation: '1 <u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → 2 <u>S</u>O<sub>4</sub><sup>2-</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> e<sup>-</sup>',
             validate: () => document.getElementById('s-in-1').value == 8,
             tip: '4 × 2 = 8 個電子（8e⁻）。'
           },
           {
             name: '步驟 3：加入 H⁺ 達成「電量守恆」',
-            desc: '目前左邊總電荷為 <strong>-2</strong>；右邊總電荷為 2×(-2) + (-8) = <strong>-12</strong>。在酸性水溶液中，請問<strong>右邊</strong>需加入幾個帶正電的 H⁺ 才能使左右總電荷都等於 -2？',
-            equation: '<u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → 2 <u>S</u>O<sub>4</sub><sup>2-</sup> + 8e<sup>-</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> H<sup>+</sup>',
+            desc: '左邊總電荷 <strong>-2</strong>；右邊為 <strong>-12</strong>。<strong>右邊</strong>需加入幾個 H⁺ 使兩邊皆為 -2？',
+            equation: '<u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> → 2 <u>S</u>O<sub>4</sub><sup>2-</sup> + 8e<sup>-</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> H<sup>+</sup>',
             validate: () => document.getElementById('s-in-1').value == 10,
-            tip: '(-12) + (+10) = -2，與左邊 -2 達成電量守恆！'
+            tip: '(-12) + (+10) = -2，需加 10 個 H⁺。'
           },
           {
             name: '步驟 4：補上 H₂O 維持「原子不滅」',
-            desc: '右邊有 10 個 H 原子與 8 個 O 原子；左邊目前有 3 個 O 原子、沒有 H 原子。請問<strong>左邊</strong>應補上幾個 H₂O 分子？',
-            equation: '<u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> + <input id="s-in-1" type="number" class="w-14 text-center border-2 border-indigo-300 rounded-lg py-1 font-bold" placeholder="?"> H<sub>2</sub>O → 2 <u>S</u>O<sub>4</sub><sup>2-</sup> + 10H<sup>+</sup> + 8e<sup>-</sup>',
+            desc: '右邊有 10 個 H 與 8 個 O；左邊目前有 3 個 O。<strong>左邊</strong>應補上幾個 H₂O？',
+            equation: '<u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> + <input id="s-in-1" type="number" class="w-12 sm:w-14 text-center border-2 border-emerald-300 rounded-lg py-1 font-bold" placeholder="?"> H<sub>2</sub>O → 2 <u>S</u>O<sub>4</sub><sup>2-</sup> + 10H<sup>+</sup> + 8e<sup>-</sup>',
             validate: () => document.getElementById('s-in-1').value == 5,
-            tip: '左邊補 5 個 H₂O，提供 10 個 H 與 5 個 O（3 + 5 = 8 個 O），原子完全不滅！'
+            tip: '左邊補 5 個 H₂O，原子完全不滅！'
           },
           {
             name: '步驟 5：完成檢核！',
-            desc: '核對與講義完全一致的強氧化劑路徑半反應式：',
-            equation: '<div class="text-emerald-700 font-black text-lg"><u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> + 5H<sub>2</sub>O → 2 <u>S</u>O<sub>4</sub><sup>2-</sup> + 10H<sup>+</sup> + 8e<sup>-</sup></div>',
+            desc: '核對最終標準半反應式：',
+            isComplete: true,
+            equation: '<div class="text-emerald-700 font-black text-base sm:text-lg"><u>S</u><sub>2</sub>O<sub>3</sub><sup>2-</sup> + 5H<sub>2</sub>O → 2 <u>S</u>O<sub>4</sub><sup>2-</sup> + 10H<sup>+</sup> + 8e<sup>-</sup></div>',
             validate: () => true,
-            tip: '遇弱氧化劑轉移 1e⁻，遇強氧化劑轉移 8e⁻，搭配電量守恆法輕鬆推導！'
+            tip: '遇弱氧化劑轉移 1e⁻，遇強氧化劑轉移 8e⁻！'
           }
         ]
       }
     ];
 
-    let currentHrIdx = 0;
+    // 半反應式隨機不重複輪播順序
+    let halfOrder = shuffle([0, 1, 2, 3, 4]);
+    let halfOrderPos = 0;
+    let currentHrIdx = halfOrder[0];
     let currentStepIdx = 0;
 
     function loadHalfReaction(idx) {
       currentHrIdx = parseInt(idx);
       currentStepIdx = 0;
+      document.getElementById('half-rxn-select').value = currentHrIdx;
       renderHalfReaction();
+    }
+
+    function nextRandomHalfReaction() {
+      halfOrderPos++;
+      if (halfOrderPos >= halfOrder.length) {
+        const lastIdx = currentHrIdx;
+        halfOrder = shuffle([0, 1, 2, 3, 4]);
+        // 避免新的一輪第一題跟上一題重複
+        if (halfOrder[0] === lastIdx) {
+          [halfOrder[0], halfOrder[1]] = [halfOrder[1], halfOrder[0]];
+        }
+        halfOrderPos = 0;
+      }
+      loadHalfReaction(halfOrder[halfOrderPos]);
     }
 
     function renderHalfReaction() {
@@ -1261,41 +1788,45 @@
       indContainer.innerHTML = problem.steps.map((s, i) => {
         let style = 'bg-slate-200 text-slate-500';
         if (i < currentStepIdx) style = 'bg-emerald-500 text-white';
-        if (i === currentStepIdx) style = 'bg-indigo-600 text-white ring-2 ring-indigo-300';
-        return `<div class="h-2 rounded-full transition-all ${style}" title="${s.name}"></div>`;
+        if (i === currentStepIdx) style = 'bg-amber-400 text-slate-900 ring-2 ring-amber-300';
+        return `<div class="h-2.5 rounded-full transition-all ${style}" title="${s.name}"></div>`;
       }).join('');
 
       const step = problem.steps[currentStepIdx];
       const workspace = document.getElementById('step-workspace');
 
+      if (step.isComplete) {
+        triggerCenterPraise();
+      }
+
       workspace.innerHTML = `
         <div class="space-y-4">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">進度：第 ${currentStepIdx + 1} / ${problem.steps.length} 步</span>
+            <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">進度：第 ${currentStepIdx + 1} / ${problem.steps.length} 步</span>
             ${currentStepIdx > 0 ? `<button onclick="currentStepIdx--; renderHalfReaction()" class="text-xs text-slate-400 hover:text-slate-600">← 返回上一步</button>` : ''}
           </div>
 
-          <h3 class="text-xl font-bold text-slate-800">${step.name}</h3>
-          <p class="text-sm text-slate-600 leading-relaxed chem-formula">${step.desc}</p>
+          <h3 class="text-lg sm:text-xl font-bold text-slate-800">${step.name}</h3>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed chem-formula">${step.desc}</p>
 
-          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 text-center text-lg md:text-xl font-bold text-slate-800 chem-formula">
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-6 text-center text-base sm:text-xl font-bold text-slate-800 chem-formula overflow-x-auto">
             ${step.equation}
           </div>
 
-          <div id="step-msg" class="hidden p-3.5 rounded-xl text-sm"></div>
+          <div id="step-msg" class="hidden p-3.5 rounded-xl text-xs sm:text-sm"></div>
 
-          <div class="flex items-center justify-between pt-2">
-            <button onclick="showStepTip()" class="text-xs font-semibold text-amber-600 hover:text-amber-700 underline">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+            <button onclick="showStepTip()" class="text-xs font-semibold text-amber-600 hover:text-amber-700 underline text-left">
               💡 需要提示錦囊？
             </button>
 
             ${currentStepIdx < problem.steps.length - 1 ? `
-              <button onclick="verifyStep()" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow transition">
+              <button onclick="verifyStep()" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow transition">
                 檢查並進入下一步 →
               </button>
             ` : `
-              <button onclick="loadHalfReaction((currentHrIdx + 1) % halfRxnProblems.length); document.getElementById('half-rxn-select').value = currentHrIdx;" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow transition">
-                挑戰下一題半反應式 →
+              <button onclick="nextRandomHalfReaction()" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow transition">
+                挑戰下一題（隨機不重複）→
               </button>
             `}
           </div>
@@ -1306,8 +1837,8 @@
     function showStepTip() {
       const step = halfRxnProblems[currentHrIdx].steps[currentStepIdx];
       const msg = document.getElementById('step-msg');
-      msg.className = 'p-3.5 rounded-xl text-sm bg-amber-50 text-amber-900 border border-amber-200';
-      msg.innerHTML = `💡 <strong>解析提示：</strong>${step.tip}`;
+      msg.className = 'p-3.5 rounded-xl text-xs sm:text-sm bg-amber-50 text-amber-900 border border-amber-200';
+      msg.innerHTML = `💡 <strong>提示：</strong>${step.tip}`;
       msg.classList.remove('hidden');
     }
 
@@ -1318,17 +1849,17 @@
         currentStepIdx++;
         renderHalfReaction();
       } else {
-        msg.className = 'p-3.5 rounded-xl text-sm bg-rose-50 text-rose-800 border border-rose-200';
-        msg.innerHTML = `❌ 數值還差一點點喔！請再檢查正負號或係數，或點擊左下角「需要提示錦囊？」。`;
+        msg.className = 'p-3.5 rounded-xl text-xs sm:text-sm bg-rose-50 text-rose-800 border border-rose-200';
+        msg.innerHTML = `❌ 差一點點！再核對正負號或原子數，也可點左下角提示錦囊。`;
         msg.classList.remove('hidden');
       }
     }
 
-    // ==================== 資料庫 3：全反應綜合平衡 ====================
+    // ==================== 資料庫 3：全反應平衡法 ====================
     const fullRxnProblems = [
       {
         title: '經典滴定反應：酸性過錳酸鉀與草酸根反應',
-        desc: '請在空格中填入最簡整數係數，使左右原子與電荷完全守恆：',
+        desc: '填入最簡整數係數，使左右原子與電荷守恆：',
         parts: [
           { coeff: 2, formula: '<u>Mn</u>O<sub>4</sub><sup>-</sup>' },
           { coeff: 5, formula: '<u>C</u><sub>2</sub>O<sub>4</sub><sup>2-</sup>' },
@@ -1340,14 +1871,14 @@
           { coeff: 8, formula: 'H<sub>2</sub>O' }
         ],
         explanation: `
-          1. <strong>還原半反應（得電子）</strong>：<u>Mn</u>O<sub>4</sub><sup>-</sup> + 8H<sup>+</sup> + <strong>5e<sup>-</sup></strong> → <u>Mn</u><sup>2+</sup> + 4H<sub>2</sub>O （1 mol 得 5e⁻）<br>
-          2. <strong>氧化半反應（失電子）</strong>：<u>C</u><sub>2</sub>O<sub>4</sub><sup>2-</sup> → 2<u>C</u>O<sub>2</sub> + <strong>2e<sup>-</sup></strong> （1 mol 失 2e⁻）<br>
-          3. <strong>電子得失相等</strong>：[5, 2] 最小公倍數為 10 → 過錳酸根乘 <strong>2</strong>，草酸根乘 <strong>5</strong>，相加即得完整平衡式！
+          1. <strong>還原（得電子）</strong>：<u>Mn</u>O<sub>4</sub><sup>-</sup> + 8H<sup>+</sup> + <strong>5e<sup>-</sup></strong> → <u>Mn</u><sup>2+</sup> + 4H<sub>2</sub>O<br>
+          2. <strong>氧化（失電子）</strong>：<u>C</u><sub>2</sub>O<sub>4</sub><sup>2-</sup> → 2<u>C</u>O<sub>2</sub> + <strong>2e<sup>-</sup></strong><br>
+          3. <strong>電子得失相等</strong>：[5, 2] 最小公倍數 10 → 過錳酸根 ×<strong>2</strong>，草酸根 ×<strong>5</strong>。
         `
       },
       {
         title: '酒測反應原理：酸性二鉻酸鉀氧化亞鐵離子',
-        desc: '利用「1 莫耳 Cr₂O₇²⁻ 得 6e⁻，1 莫耳 Fe²⁺ 失 1e⁻」快速求算係數：',
+        desc: '1 mol Cr₂O₇²⁻ 得 6e⁻，1 mol Fe²⁺ 失 1e⁻，求算係數：',
         parts: [
           { coeff: 1, formula: '<u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup>' },
           { coeff: 6, formula: '<u>Fe</u><sup>2+</sup>' },
@@ -1359,9 +1890,9 @@
           { coeff: 7, formula: 'H<sub>2</sub>O' }
         ],
         explanation: `
-          1. <strong>還原半反應</strong>：<u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> + 14H<sup>+</sup> + <strong>6e<sup>-</sup></strong> → 2<u>Cr</u><sup>3+</sup> + 7H<sub>2</sub>O<br>
-          2. <strong>氧化半反應</strong>：<u>Fe</u><sup>2+</sup> → <u>Fe</u><sup>3+</sup> + <strong>e<sup>-</sup></strong><br>
-          3. <strong>電子得失相等</strong>：1 mol Cr₂O₇²⁻ 需搭配 <strong>6 mol</strong> Fe²⁺ 才能恰好轉移 6 mol 電子。
+          1. <strong>還原</strong>：<u>Cr</u><sub>2</sub>O<sub>7</sub><sup>2-</sup> + 14H<sup>+</sup> + <strong>6e<sup>-</sup></strong> → 2<u>Cr</u><sup>3+</sup> + 7H<sub>2</sub>O<br>
+          2. <strong>氧化</strong>：<u>Fe</u><sup>2+</sup> → <u>Fe</u><sup>3+</sup> + <strong>e<sup>-</sup></strong><br>
+          3. <strong>電子得失相等</strong>：1 mol Cr₂O₇²⁻ 搭配 <strong>6 mol</strong> Fe²⁺ 恰好轉移 6e⁻。
         `
       },
       {
@@ -1378,14 +1909,14 @@
           { coeff: 4, formula: 'H<sub>2</sub>O' }
         ],
         explanation: `
-          1. <strong>氧化半反應</strong>：<u>Cu</u> → <u>Cu</u><sup>2+</sup> + <strong>2e<sup>-</sup></strong> （乘 3 倍）<br>
-          2. <strong>還原半反應</strong>：<u>N</u>O<sub>3</sub><sup>-</sup> + 4H<sup>+</sup> + <strong>3e<sup>-</sup></strong> → <u>N</u>O + 2H<sub>2</sub>O （乘 2 倍）<br>
-          3. <strong>合併相加</strong>：3Cu + 2NO<sub>3</sub><sup>-</sup> + 8H<sup>+</sup> → 3Cu<sup>2+</sup> + 2NO + 4H<sub>2</sub>O。
+          1. <strong>氧化</strong>：<u>Cu</u> → <u>Cu</u><sup>2+</sup> + <strong>2e<sup>-</sup></strong> （×3）<br>
+          2. <strong>還原</strong>：<u>N</u>O<sub>3</sub><sup>-</sup> + 4H<sup>+</sup> + <strong>3e<sup>-</sup></strong> → <u>N</u>O + 2H<sub>2</sub>O （×2）<br>
+          3. <strong>相加</strong>：3Cu + 2NO<sub>3</sub><sup>-</sup> + 8H<sup>+</sup> → 3Cu<sup>2+</sup> + 2NO + 4H<sub>2</sub>O。
         `
       },
       {
         title: '雙氧水使酸性過錳酸鉀褪色（產生氧氣）',
-        desc: 'H₂O₂ 遇更強的氧化劑 MnO₄⁻ 時作為「還原劑」，氧化產生 O₂：',
+        desc: 'H₂O₂ 遇強氧化劑 MnO₄⁻ 作「還原劑」產生 O₂：',
         parts: [
           { coeff: 2, formula: '<u>Mn</u>O<sub>4</sub><sup>-</sup>' },
           { coeff: 5, formula: 'H<sub>2</sub><u>O</u><sub>2</sub>' },
@@ -1397,51 +1928,54 @@
           { coeff: 8, formula: 'H<sub>2</sub>O' }
         ],
         explanation: `
-          1. <strong>還原半反應</strong>：<u>Mn</u>O<sub>4</sub><sup>-</sup> + 8H<sup>+</sup> + <strong>5e<sup>-</sup></strong> → <u>Mn</u><sup>2+</sup> + 4H<sub>2</sub>O （乘 2 倍 → 16H⁺、8H₂O）<br>
-          2. <strong>氧化半反應</strong>：H<sub>2</sub><u>O</u><sub>2</sub> → <u>O</u><sub>2</sub> + 2H<sup>+</sup> + <strong>2e<sup>-</sup></strong> （乘 5 倍 → 10H⁺）<br>
-          3. <strong>消去兩邊重複的 H⁺</strong>：左邊 16H⁺ 與右邊 10H⁺ 相消後，左邊淨剩 <strong>6H⁺</strong>！
+          1. <strong>還原</strong>：<u>Mn</u>O<sub>4</sub><sup>-</sup> + 8H<sup>+</sup> + <strong>5e<sup>-</sup></strong> → <u>Mn</u><sup>2+</sup> + 4H<sub>2</sub>O （×2 → 16H⁺、8H₂O）<br>
+          2. <strong>氧化</strong>：H<sub>2</sub><u>O</u><sub>2</sub> → <u>O</u><sub>2</sub> + 2H<sup>+</sup> + <strong>2e<sup>-</sup></strong> （×5 → 10H⁺）<br>
+          3. <strong>約分</strong>：16H⁺ 與右邊 10H⁺ 相消，左邊淨剩 <strong>6H⁺</strong>！
         `
       }
     ];
 
-    let fullIdx = 0;
+    // 全反應隨機不重複輪播順序
+    let fullOrder = shuffle([0, 1, 2, 3]);
+    let fullPos = 0;
 
     function renderFullRxn() {
-      const item = fullRxnProblems[fullIdx];
-      document.getElementById('full-rxn-counter').innerText = `${fullIdx + 1} / ${fullRxnProblems.length}`;
+      const actualIdx = fullOrder[fullPos];
+      const item = fullRxnProblems[actualIdx];
+      document.getElementById('full-rxn-counter').innerText = `${fullPos + 1} / ${fullRxnProblems.length}`;
 
       const buildSide = (arr, prefix) => arr.map((p, i) => `
-        <span class="inline-flex items-center gap-1.5 my-1">
-          <input id="${prefix}-${i}" type="number" min="1" class="w-14 text-center border-2 border-slate-300 focus:border-indigo-500 rounded-lg py-1.5 font-black text-indigo-700" placeholder="?">
-          <span class="font-bold text-slate-800 chem-formula">${p.formula}</span>
+        <span class="inline-flex items-center gap-1 sm:gap-1.5 my-1">
+          <input id="${prefix}-${i}" type="number" min="1" class="w-11 sm:w-14 text-center border-2 border-slate-300 focus:border-amber-500 rounded-lg py-1 sm:py-1.5 font-black text-amber-800 text-sm sm:text-base" placeholder="?">
+          <span class="font-bold text-slate-800 chem-formula text-base sm:text-xl">${p.formula}</span>
         </span>
-      `).join('<span class="mx-2 font-bold text-slate-400">+</span>');
+      `).join('<span class="mx-1 sm:mx-2 font-bold text-slate-400">+</span>');
 
       document.getElementById('full-rxn-workspace').innerHTML = `
         <div class="space-y-5">
           <div>
-            <h3 class="text-xl font-bold text-slate-800">${item.title}</h3>
-            <p class="text-sm text-slate-500 mt-1">${item.desc}</p>
+            <h3 class="text-lg sm:text-xl font-bold text-slate-800">${item.title}</h3>
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">${item.desc}</p>
           </div>
 
-          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-wrap items-center justify-center gap-2 text-lg md:text-xl">
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-6 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
             ${buildSide(item.parts, 'lhs')}
-            <span class="mx-3 font-black text-indigo-600 text-2xl">→</span>
+            <span class="mx-2 sm:mx-3 font-black text-amber-600 text-xl sm:text-2xl">→</span>
             ${buildSide(item.products, 'rhs')}
           </div>
 
-          <div id="full-feedback" class="hidden p-4 rounded-xl text-sm leading-relaxed"></div>
+          <div id="full-feedback" class="hidden p-4 rounded-xl text-xs sm:text-sm leading-relaxed"></div>
 
-          <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
-            <button onclick="toggleFullExplain()" class="px-4 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-sm transition">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+            <button onclick="toggleFullExplain()" class="w-full sm:w-auto px-4 py-2.5 sm:py-2 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm transition">
               📖 顯示／隱藏完整詳解
             </button>
-            <button onclick="checkFullRxn()" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow transition">
+            <button onclick="checkFullRxn()" class="w-full sm:w-auto px-6 py-3 sm:py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-sm shadow transition">
               ✓ 驗證係數答案
             </button>
           </div>
 
-          <div id="full-explain-box" class="hidden bg-indigo-50/70 border border-indigo-200 rounded-xl p-5 text-sm text-slate-700 leading-7 chem-formula">
+          <div id="full-explain-box" class="hidden bg-amber-50/70 border border-amber-200 rounded-xl p-4 sm:p-5 text-xs sm:text-sm text-slate-700 leading-7 chem-formula">
             ${item.explanation}
           </div>
         </div>
@@ -1449,7 +1983,8 @@
     }
 
     function checkFullRxn() {
-      const item = fullRxnProblems[fullIdx];
+      const actualIdx = fullOrder[fullPos];
+      const item = fullRxnProblems[actualIdx];
       let allCorrect = true;
 
       item.parts.forEach((p, i) => {
@@ -1477,12 +2012,13 @@
       const fb = document.getElementById('full-feedback');
       fb.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-900', 'bg-rose-50', 'text-rose-900');
       if (allCorrect) {
-        fb.classList.add('bg-emerald-50', 'text-emerald-900', 'border', 'border-emerald-200');
-        fb.innerHTML = '🎉 <strong>完全正確！</strong> 原子數量與左右電荷皆已達成完美平衡！';
+        triggerCenterPraise();
+        fb.classList.add('hidden');
         document.getElementById('full-explain-box').classList.remove('hidden');
       } else {
+        fb.classList.remove('hidden');
         fb.classList.add('bg-rose-50', 'text-rose-900', 'border', 'border-rose-200');
-        fb.innerHTML = '⚠️ <strong>部分係數有誤（已用紅框標示）</strong>，請檢查電子得失總數或 H⁺ / H₂O 數量，也可點選「顯示完整詳解」。';
+        fb.innerHTML = '💪 <strong>就差一點點！</strong> 紅框係數再檢查電子得失最小公倍數喔！';
       }
     }
 
@@ -1491,34 +2027,63 @@
     }
 
     function prevFullRxn() {
-      fullIdx = (fullIdx - 1 + fullRxnProblems.length) % fullRxnProblems.length;
+      fullPos = (fullPos - 1 + fullOrder.length) % fullOrder.length;
       renderFullRxn();
     }
 
     function nextFullRxn() {
-      fullIdx = (fullIdx + 1) % fullRxnProblems.length;
+      fullPos++;
+      if (fullPos >= fullOrder.length) {
+        const lastActual = fullOrder[fullOrder.length - 1];
+        fullOrder = shuffle([0, 1, 2, 3]);
+        if (fullOrder[0] === lastActual) {
+          [fullOrder[0], fullOrder[1]] = [fullOrder[1], fullOrder[0]];
+        }
+        fullPos = 0;
+      }
       renderFullRxn();
     }
 
-    // ==================== 頁籤切換 ====================
+    // ==================== 歡迎頁與三模式頁籤切換（預設全白底，選中變亮黃色） ====================
+    const defaultWhiteTabClasses = ['bg-white', 'text-slate-800', 'border-2', 'border-white/80', 'hover:bg-amber-50', 'shadow'];
+    const selectedYellowTabClasses = ['bg-amber-300', 'text-slate-950', 'border-2', 'border-amber-200', 'shadow-lg', 'ring-2', 'ring-amber-300/60', 'scale-[1.01]'];
+
+    function showWelcome() {
+      stopQuizTimer();
+      document.getElementById('welcome-screen').classList.remove('hidden');
+      document.getElementById('top-nav-tabs').classList.add('hidden');
+      document.getElementById('home-btn').classList.add('hidden');
+      [1, 2, 3].forEach(n => {
+        document.getElementById(`stage-${n}`).classList.add('hidden');
+      });
+    }
+
     function switchTab(tabNum) {
       if (tabNum !== 1) stopQuizTimer();
+
+      document.getElementById('welcome-screen').classList.add('hidden');
+      document.getElementById('top-nav-tabs').classList.remove('hidden');
+      document.getElementById('home-btn').classList.remove('hidden');
+
       [1, 2, 3].forEach(n => {
         document.getElementById(`stage-${n}`).classList.add('hidden');
         const btn = document.getElementById(`tab-btn-${n}`);
-        btn.classList.remove('bg-indigo-600', 'text-white', 'shadow');
-        btn.classList.add('text-slate-300');
+        btn.classList.remove(...defaultWhiteTabClasses, ...selectedYellowTabClasses);
+        if (n === tabNum) {
+          btn.classList.add(...selectedYellowTabClasses);
+        } else {
+          btn.classList.add(...defaultWhiteTabClasses);
+        }
       });
       document.getElementById(`stage-${tabNum}`).classList.remove('hidden');
-      const activeBtn = document.getElementById(`tab-btn-${tabNum}`);
-      activeBtn.classList.add('bg-indigo-600', 'text-white', 'shadow');
-      activeBtn.classList.remove('text-slate-300');
     }
 
-    // 初始化
+    // 初始化（預設先進入歡迎大廳，半反應式與全反應式載入隨機首題）
     setFilter('all');
-    renderHalfReaction();
+    loadHalfReaction(halfOrder[0]);
     renderFullRxn();
+    updateMistakeBadge();
+    showWelcome();
   </script>
 </body>
 </html>
