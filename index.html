@@ -110,7 +110,7 @@
               高三選修化學 IV｜氧化還原互動學習
             </h1>
             <p class="text-[11px] sm:text-xs text-indigo-200/90 truncate">
-              常見氧化劑／還原劑對應變化・半反應式平衡法・全反應平衡法
+              常見氧化劑／還原劑對應變化・半反應平衡法・氧化數平衡法
             </p>
           </div>
         </div>
@@ -133,12 +133,12 @@
 
         <button onclick="switchTab(2)" id="tab-btn-2" class="tab-btn flex items-center justify-center sm:justify-start gap-2.5 px-4 py-2.5 rounded-xl text-sm sm:text-base font-extrabold transition-all bg-white text-slate-800 border-2 border-white/80 hover:bg-amber-50 shadow">
           <span class="text-xl sm:text-2xl leading-none" aria-hidden="true">⚗️</span>
-          <span class="leading-snug">半反應式平衡法</span>
+          <span class="leading-snug">半反應平衡法</span>
         </button>
 
         <button onclick="switchTab(3)" id="tab-btn-3" class="tab-btn flex items-center justify-center sm:justify-start gap-2.5 px-4 py-2.5 rounded-xl text-sm sm:text-base font-extrabold transition-all bg-white text-slate-800 border-2 border-white/80 hover:bg-amber-50 shadow">
           <span class="text-xl sm:text-2xl leading-none" aria-hidden="true">🧫</span>
-          <span class="leading-snug">全反應平衡法</span>
+          <span class="leading-snug">氧化數平衡法</span>
         </button>
       </nav>
     </div>
@@ -157,7 +157,7 @@
           今天想挑戰哪一個關卡？
         </h2>
         <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
-          從試劑變化記憶、半反應平衡法，到全反應平衡法，三步驟引導攻克氧化還原！
+          從試劑變化記憶、半反應平衡法，到氧化數平衡法，引導攻克氧化還原反應式之平衡！
         </p>
       </div>
 
@@ -195,7 +195,7 @@
             <div class="space-y-2">
               <span class="text-xs font-extrabold text-emerald-600 group-hover:text-amber-700 uppercase tracking-wider">關卡 2・觀念拆解</span>
               <h3 class="text-xl font-black text-slate-900 leading-snug">
-                半反應式平衡法
+                半反應平衡法
               </h3>
               <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
                 氧化數變化量 &rarr; 電子得失 &rarr; 電量守恆 &rarr; 原子不滅，隨機抽題逐步引導。
@@ -217,7 +217,7 @@
             <div class="space-y-2">
               <span class="text-xs font-extrabold text-amber-600 group-hover:text-amber-700 uppercase tracking-wider">關卡 3・實戰演練</span>
               <h3 class="text-xl font-black text-slate-900 leading-snug">
-                全反應平衡法
+                氧化數平衡法
               </h3>
               <p class="text-xs sm:text-sm text-slate-500 leading-relaxed">
                 精選段考經典方程式，隨機出題挑戰最簡整數係數平衡。
@@ -225,7 +225,7 @@
             </div>
           </div>
           <div class="pt-6 mt-4 border-t border-slate-100 flex items-center justify-between text-sm font-extrabold text-amber-700">
-            <span>挑戰全反應平衡</span>
+            <span>挑戰氧化數平衡法 </span>
             <span class="text-lg group-hover:translate-x-1 transition-transform">&rarr;</span>
           </div>
         </div>
@@ -463,13 +463,13 @@
       </div>
     </section>
 
-    <!-- ==================== 第二階段：半反應式平衡法 ==================== -->
+    <!-- ==================== 第二階段：半反應平衡法 ==================== -->
     <section id="stage-2" class="hidden fade-in space-y-5 sm:space-y-6">
       <!-- 題目選擇器 -->
       <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 space-y-4">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
-            <h2 class="text-base sm:text-lg font-bold text-slate-800">半反應式平衡引導（氧化數變化量 &rarr; 電子得失 &rarr; 電量守恆 &rarr; 原子不滅）</h2>
+            <h2 class="text-base sm:text-lg font-bold text-slate-800">半反應平衡引導（氧化數變化量 &rarr; 電子得失 &rarr; 電量守恆 &rarr; 原子不滅）</h2>
             <p class="text-xs sm:text-sm text-slate-500 mt-0.5">每次進入隨機抽題不重複，逐步完成氧化數判別、電子轉移、電量守恆與原子不滅檢核</p>
           </div>
           <select id="half-rxn-select" onchange="loadHalfReaction(this.value)" class="w-full md:w-auto px-3.5 py-2.5 rounded-xl border border-slate-300 bg-slate-50 font-semibold text-xs sm:text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-400">
@@ -502,11 +502,11 @@
       </div>
     </section>
 
-    <!-- ==================== 第三階段：全反應平衡法 ==================== -->
+    <!-- ==================== 第三階段：氧化數平衡法 ==================== -->
     <section id="stage-3" class="hidden fade-in space-y-5 sm:space-y-6">
       <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 class="text-base sm:text-lg font-bold text-slate-800"> 全反應平衡法 </h2>
+          <h2 class="text-base sm:text-lg font-bold text-slate-800"> 氧化數平衡法 </h2>
           <p class="text-xs sm:text-sm text-slate-500 mt-0.5"> 沒事多練習，多練習沒事 </p>
         </div>
         <div class="flex items-center justify-between sm:justify-end gap-2">
@@ -1482,7 +1482,7 @@
       }
     }
 
-    // ==================== 資料庫 2：半反應式平衡法引導 ====================
+    // ==================== 資料庫 2：半反應平衡法引導 ====================
     const halfRxnProblems = [
       {
         env: '酸性環境（使用 H⁺ 平衡電荷）',
@@ -1855,7 +1855,7 @@
       }
     }
 
-    // ==================== 資料庫 3：全反應平衡法 ====================
+    // ==================== 資料庫 3：氧化數平衡法 ====================
     const fullRxnProblems = [
       {
         title: '經典滴定反應：酸性過錳酸鉀與草酸根反應',
